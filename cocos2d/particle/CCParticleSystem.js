@@ -1422,7 +1422,7 @@ cc.ParticleSystem = cc.Node.extend(/** @lends cc.ParticleSystem# */{
                 // texture
                 // Try to get the texture from the cache
                 var textureName = locValueForKey("textureFileName", dictionary);
-                var imgPath = cc.path.changeBasename(this._plistFile, textureName);
+                var imgPath = cc.path.changeBasename(this._plistFile, cc.path.mainFileName(this._plistFile) + textureName);
                 var tex = cc.textureCache.getTextureForKey(imgPath);
 
                 if (tex) {
