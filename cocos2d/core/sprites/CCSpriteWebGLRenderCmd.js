@@ -437,6 +437,10 @@
 
                 gl.bindBuffer(gl.ARRAY_BUFFER, this._quadWebBuffer);
                 if (this._quadDirty) {
+					this._quad.tl.vertices.z = 0;
+					this._quad.tr.vertices.z = 0;
+					this._quad.bl.vertices.z = 0;
+					this._quad.br.vertices.z = 0;
                     gl.bufferData(gl.ARRAY_BUFFER, this._quad.arrayBuffer, gl.DYNAMIC_DRAW);
                     this._quadDirty = false;
                 }
@@ -456,6 +460,10 @@
 
             gl.bindBuffer(gl.ARRAY_BUFFER, this._quadWebBuffer);
             if (this._quadDirty) {
+				this._quad.tl.vertices.z = 0;
+				this._quad.tr.vertices.z = 0;
+				this._quad.bl.vertices.z = 0;
+				this._quad.br.vertices.z = 0;
                 gl.bufferData(gl.ARRAY_BUFFER, this._quad.arrayBuffer, gl.STATIC_DRAW);
                 this._quadDirty = false;
             }

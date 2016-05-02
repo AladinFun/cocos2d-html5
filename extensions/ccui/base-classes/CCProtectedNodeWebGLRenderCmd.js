@@ -130,7 +130,7 @@
                 }
                 //cc.kmGLTranslatef(apx, apy, 0);
                 var translation = cc.math.Matrix4.createByTranslation(apx, apy, 0, t4x4);       //t4x4 as a temp matrix
-                stackMatrix.multiply(translate);
+                stackMatrix.multiply(translation);
 
                 node._camera._locateForRenderer(stackMatrix);
 
