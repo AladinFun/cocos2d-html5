@@ -42,6 +42,7 @@
     proto.transform = function (parentCmd, recursive) {
         cc.Node.WebGLRenderCmd.prototype.transform.call(this, parentCmd, recursive);
         this._node._sprite._renderCmd.transform(this, recursive);
+        this._updateProgressData();
     };
 
     proto.rendering = function (ctx) {
