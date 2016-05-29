@@ -621,6 +621,14 @@ cc.loader = (function () {
 
     return /** @lends cc.Loader# */{
         /**
+         * @type {Object}
+         */
+        _aliases : _aliases,
+        /**
+         * @type {Object}
+         */
+        _register : _register,
+        /**
          * Root path of resources.
          * @type {String}
          */
@@ -1097,9 +1105,10 @@ cc.loader = (function () {
             for (var key in fileNames) {
                 var value = fileNames[key];
                 _aliases[key] = value;
-                resList.push(value);
+                // resList.push(value);
             }
-            this.load(resList, cb);
+            cb && cb();
+            //this.load(resList, cb);
         },
 
         /**
@@ -1187,7 +1196,7 @@ cc.loader = (function () {
             }
             delete cache[url];
             delete cache[_aliases[url]];
-            delete _aliases[url];
+            // delete _aliases[url];
         },
 
         /**
@@ -1197,8 +1206,8 @@ cc.loader = (function () {
             var locCache = this.cache;
             for (var key in locCache)
                 delete locCache[key];
-            for (var key in _aliases)
-                delete _aliases[key];
+            // for (var key in _aliases)
+            //     delete _aliases[key];
         }
     };
 })();
@@ -1647,6 +1656,7 @@ var _initSys = function () {
      * @memberof cc.sys
      * @name isNative
      * @type {Boolean}
+     * @const
      */
     sys.isNative = false;
 
