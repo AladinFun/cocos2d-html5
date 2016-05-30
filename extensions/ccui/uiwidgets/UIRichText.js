@@ -532,17 +532,17 @@ ccui.RichText = ccui.Widget.extend(/** @lends ccui.RichText# */{
      * @override
      * @param {cc.Point} pt
      */
-    setAnchorPoint: function (pt) {
-        ccui.Widget.prototype.setAnchorPoint.call(this, pt);
-        this._elementRenderersContainer.setAnchorPoint(pt);
+    setAnchorPoint: function (pt, y) {
+        ccui.Widget.prototype.setAnchorPoint.call(this, pt, y);
+        // this._elementRenderersContainer.setAnchorPoint(pt, y);
     },
     _setAnchorX: function (x) {
         ccui.Widget.prototype._setAnchorX.call(this, x);
-        this._elementRenderersContainer._setAnchorX(x);
+        // this._elementRenderersContainer._setAnchorX(x);
     },
     _setAnchorY: function (y) {
         ccui.Widget.prototype._setAnchorY.call(this, y);
-        this._elementRenderersContainer._setAnchorY(y);
+        // this._elementRenderersContainer._setAnchorY(y);
     },
 
     /**
