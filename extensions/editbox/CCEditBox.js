@@ -382,6 +382,15 @@ cc.EditBox = cc.ControlButton.extend({
         }
     },
 
+    setEnabled : function(isEnabled) {
+        cc.ControlButton.prototype.setEnabled.call(this, isEnabled);
+        if(isEnabled) {
+            this._edTxt.disabled = null;
+        } else {
+            this._edTxt.disabled = true;
+        }
+    },
+
     /**
      *  Set the text entered in the edit box.
      * @deprecated
