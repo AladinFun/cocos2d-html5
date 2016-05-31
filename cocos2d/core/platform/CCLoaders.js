@@ -99,16 +99,25 @@ cc._fontLoader = {
             fontStr += "@font-face { font-family:" + name + "; src:";
         else
             fontStr += "@font-face { font-family:'" + name + "'; src:";
+        function getRealUrl(url) {
+            var realUrl = url;
+            if (!cc.loader._urlRegExp.test(url))
+            {
+                var basePath = cc.loader.getBasePath ? cc.loader.getBasePath() : cc.loader.resPath;
+                realUrl = cc.loader.getUrl(basePath, url);
+            }
+            return realUrl;
+        }
         if(srcs instanceof Array){
             for(var i = 0, li = srcs.length; i < li; i++){
                 var src = srcs[i];
                 type = path.extname(src).toLowerCase();
-                fontStr += "url('" + srcs[i] + "') format('" + TYPE[type] + "')";
+                fontStr += "url('" + getRealUrl(srcs[i]) + "') format('" + TYPE[type] + "')";
                 fontStr += (i === li - 1) ? ";" : ",";
             }
         }else{
             type = type.toLowerCase();
-            fontStr += "url('" + srcs + "') format('" + TYPE[type] + "');";
+            fontStr += "url('" + getRealUrl(srcs) + "') format('" + TYPE[type] + "');";
         }
         fontStyle.textContent += fontStr + "}";
 

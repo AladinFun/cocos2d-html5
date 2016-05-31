@@ -621,6 +621,10 @@ cc.loader = (function () {
 
     return /** @lends cc.Loader# */{
         /**
+         * @type {RegExp}
+         */
+        _urlRegExp : _urlRegExp,
+        /**
          * @type {Object}
          */
         _aliases : _aliases,
