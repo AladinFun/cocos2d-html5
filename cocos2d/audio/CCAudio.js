@@ -291,8 +291,9 @@ cc.Audio.WebAudio.prototype = {
         var audio = this._currentSource;
         this._currentSource = null;
         this._startTime = -1;
-        if (audio)
+        if (audio) {
             audio.stop(0);
+        }
     }
 };
 
@@ -617,7 +618,6 @@ cc.Audio.WebAudio.prototype = {
          * var soundId = cc.audioEngine.playEffect(path);
          */
         playEffect: function(url, loop){
-
             if (SWB && this._currMusic && this._currMusic.getPlaying()) {
                 cc.log('Browser is only allowed to play one audio');
                 return null;
@@ -679,16 +679,34 @@ cc.Audio.WebAudio.prototype = {
             }
 
             loader.useWebAudio = true;
+            var shouldPlay = true;
+            var ctx = {};
+            ctx.audio = audio;
             cc.loader.load(url, function (audio) {
-                audio = cc.loader.getRes(url);
-                audio = audio.cloneNode();
-                audio.setVolume(cc.audioEngine._effectVolume);
-                audio.play(0, loop || false);
-                effectList.push(audio);
+                if(shouldPlay) {
+                    ctx.audio = cc.loader.getRes(url);
+                    ctx.audio = ctx.audio.cloneNode();
+                    ctx.audio.setVolume(cc.audioEngine._effectVolume);
+                    ctx.audio.play(0, loop || false);
+                    effectList.push(ctx.audio);
+                }
             });
             loader.useWebAudio = false;
 
-            return audio;
+            return ctx.audio || {
+                pause : function() {
+                    shouldPlay = false;
+                    if(ctx.audio) {
+                        ctx.audio.pause();
+                    }
+                },
+                stop : function() {
+                    shouldPlay = false;
+                    if(ctx.audio) {
+                        ctx.audio.stop();
+                    }
+                }
+            };
         },
 
         /**
