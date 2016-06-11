@@ -439,7 +439,6 @@
             "external/pluginx/Plugin.js"
         ],
         "plugin-facebook" : [
-            "external/pluginx/platform/facebook_sdk.js",
             "external/pluginx/platform/facebook.js"
         ],
 

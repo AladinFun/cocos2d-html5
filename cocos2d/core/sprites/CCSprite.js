@@ -976,7 +976,14 @@ cc.Sprite = cc.Node.extend(/** @lends cc.Sprite# */{
             return new cc.Sprite.CanvasRenderCmd(this);
         else
             return new cc.Sprite.WebGLRenderCmd(this);
-    }
+    },
+
+    setShaderProgram: function (newShaderProgram) {
+        cc.Node.prototype.setShaderProgram.call(this, newShaderProgram);
+        if(this.isRunning) {
+            this._renderCmd._updateBlendFunc();
+        }
+    },
 });
 
 /**

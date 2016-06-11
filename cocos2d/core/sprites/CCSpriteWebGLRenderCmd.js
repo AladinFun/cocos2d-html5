@@ -84,7 +84,7 @@
         info.texture = this._node._texture;
         info.blendSrc = this._node._blendFunc.src;
         info.blendDst = this._node._blendFunc.dst;
-        info.shader = this.batchShader;
+        info.shader = this._shaderProgram || this.batchShader;
     };
 
     proto._invalidBatch = function () {
