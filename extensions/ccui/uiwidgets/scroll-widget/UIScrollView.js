@@ -70,7 +70,7 @@ ccui.ScrollView = ccui.Layout.extend(/** @lends ccui.ScrollView# */{
 
     inertiaScrollEnabled: false,
 
-    _scrollBarEnabled: true,
+    _scrollBarEnabled: false,
     _verticalScrollBar: null,
     _horizontalScrollBar: null,
 
@@ -103,8 +103,8 @@ ccui.ScrollView = ccui.Layout.extend(/** @lends ccui.ScrollView# */{
         this._touchMoveTimeDeltas = [];
         this._touchMovePreviousTimestamp = 0;
 
-        this._scrollBarEnabled = true;
-        this._initScrollBar();
+        this._scrollBarEnabled = false;
+        // this._initScrollBar();
 
         this.setTouchEnabled(true);
     },
