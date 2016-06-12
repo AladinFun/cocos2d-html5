@@ -21,6 +21,8 @@ cc.profiler = (function () {
     _fps.style.left = cc.DIRECTOR_STATS_POSITION.x + 'px';
     _fps.style.width = '45px';
     _fps.style.height = '60px';
+    _fps.style.pointerEvents = 'none';
+    _fps.style.opacity = '0.6';
 
     var labels = [_drawsLabel, _SPFLabel, _FPSLabel];
     for (var i = 0; i < 3; ++i) {

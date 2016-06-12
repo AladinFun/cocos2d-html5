@@ -2680,6 +2680,7 @@ cc.game = /** @lends cc.game# */{
         }
 
         cc._gameDiv = localContainer;
+        cc._gameDiv.style.overflow = 'hidden';
         cc.game.canvas.oncontextmenu = function () {
             if (!cc._isContextMenuEnable) return false;
         };
