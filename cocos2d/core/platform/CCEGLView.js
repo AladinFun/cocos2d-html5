@@ -52,8 +52,7 @@ cc.__BrowserGetter = {
             return frame.clientHeight;
     },
     meta: {
-        "width": "device-width",
-        "user-scalable": "no"
+        "width": "device-width"
     },
     adaptationType: cc.sys.browserType
 };
@@ -130,7 +129,7 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
     // The visible rect in content's coordinate in point
     _visibleRect: null,
 	_retinaEnabled: false,
-    _autoFullScreen: true,
+    _autoFullScreen: false,
     // The device's pixel ratio (for retina displays)
     _devicePixelRatio: 1,
     // the view name
@@ -187,6 +186,7 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
 
 	    var sys = cc.sys;
         _t.enableRetina(sys.os === sys.OS_IOS || sys.os === sys.OS_OSX);
+        _t.enableAutoFullScreen(sys.isMobile && sys.browserType !== sys.BROWSER_TYPE_BAIDU);
         cc.visibleRect && cc.visibleRect.init(_t._visibleRect);
 
         // Setup system default resolution policies
@@ -204,9 +204,9 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
     // Resize helper functions
     _resizeEvent: function () {
         var view;
-        if(this.setDesignResolutionSize){
+        if (this.setDesignResolutionSize) {
             view = this;
-        }else{
+        } else {
             view = cc.view;
         }
 
@@ -222,8 +222,9 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
         }
         var width = view._originalDesignResolutionSize.width;
         var height = view._originalDesignResolutionSize.height;
-        if (width > 0)
+        if (width > 0) {
             view.setDesignResolutionSize(width, height, view._resolutionPolicy);
+        }
     },
 
     /**
@@ -260,8 +261,8 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
             //enable
             if (!this.__resizeWithBrowserSize) {
                 this.__resizeWithBrowserSize = true;
-                cc._addEventListener(window, 'resize', this._resizeEvent);
-                cc._addEventListener(window, 'orientationchange', this._resizeEvent);
+                window.addEventListener('resize', this._resizeEvent);
+                window.addEventListener('orientationchange', this._resizeEvent);
             }
         } else {
             //disable
@@ -302,7 +303,7 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
 
     _setViewportMeta: function (metas, overwrite) {
         var vp = document.getElementById("cocosMetaElement");
-        if(vp){
+        if(vp && overwrite){
             document.head.removeChild(vp);
         }
 
@@ -310,12 +311,12 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
             currentVP = elems ? elems[0] : null,
             content, key, pattern;
 
-        vp = cc.newElement("meta");
+        content = currentVP ? currentVP.content : "";
+        vp = vp || document.createElement("meta");
         vp.id = "cocosMetaElement";
         vp.name = "viewport";
         vp.content = "";
 
-        content = currentVP ? currentVP.content : "";
         for (key in metas) {
             if (content.indexOf(key) == -1) {
                 content += "," + key + "=" + metas[key];
@@ -339,6 +340,8 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
     _adjustViewportMeta: function () {
         if (this._isAdjustViewPort) {
             this._setViewportMeta(cc.__BrowserGetter.meta, false);
+            // Only adjust viewport once
+            this._isAdjustViewPort = false;
         }
     },
 
@@ -401,7 +404,14 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
      * @param {Boolean} enabled  Enable or disable auto full screen on mobile devices
      */
     enableAutoFullScreen: function(enabled) {
-        this._autoFullScreen = enabled ? true : false;
+        if (enabled && enabled !== this._autoFullScreen && cc.sys.isMobile && this._frame === document.documentElement) {
+            // Automatically full screen when user touches on mobile version
+            this._autoFullScreen = true;
+            cc.screen.autoFullScreen(this._frame);
+        }
+        else {
+            this._autoFullScreen = false;
+        }
     },
 
     /**
@@ -469,6 +479,16 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
     },
 
     /**
+     * Returns the canvas size of the view.<br/>
+     * On native platforms, it returns the screen size since the view is a fullscreen view.<br/>
+     * On web, it returns the size of the canvas element.
+     * @return {cc.Size}
+     */
+    getCanvasSize: function () {
+        return cc.size(cc._canvas.width, cc._canvas.height);
+    },
+
+    /**
      * Returns the frame size of the view.<br/>
      * On native platforms, it returns the screen size since the view is a fullscreen view.<br/>
      * On web, it returns the size of the canvas's outer DOM element.
@@ -509,11 +529,29 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
     },
 
     /**
+     * Returns the visible area size of the view port.
+     * @return {cc.Size}
+     */
+    getVisibleSizeInPixel: function () {
+        return cc.size( this._visibleRect.width * this._scaleX,
+                        this._visibleRect.height * this._scaleY );
+    },
+
+    /**
      * Returns the visible origin of the view port.
      * @return {cc.Point}
      */
     getVisibleOrigin: function () {
         return cc.p(this._visibleRect.x,this._visibleRect.y);
+    },
+
+    /**
+     * Returns the visible origin of the view port.
+     * @return {cc.Point}
+     */
+    getVisibleOriginInPixel: function () {
+        return cc.p(this._visibleRect.x * this._scaleX, 
+                    this._visibleRect.y * this._scaleY);
     },
 
     /**
@@ -628,7 +666,7 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
         cc.winSize.width = director._winSizeInPoints.width;
         cc.winSize.height = director._winSizeInPoints.height;
 
-        if (cc._renderType === cc._RENDER_TYPE_WEBGL) {
+        if (cc._renderType === cc.game.RENDER_TYPE_WEBGL) {
             // reset director's member variables to fit visible rect
             director.setGLDefaultValues();
         }
@@ -666,11 +704,10 @@ cc.EGLView = cc.Class.extend(/** @lends cc.view# */{
      */
     setRealPixelResolution: function (width, height, resolutionPolicy) {
         // Set viewport's width
-        this._setViewportMeta({"width": width, "user-scalable": "no"}, true);
+        this._setViewportMeta({"width": width, "target-densitydpi": cc.DENSITYDPI_DEVICE}, true);
 
         // Set body width to the exact pixel resolution
         document.body.style.width = width + "px";
-        document.body.style.height = "100%";
         document.body.style.left = "0px";
         document.body.style.top = "0px";
 
@@ -855,10 +892,6 @@ cc.ContainerStrategy = cc.Class.extend(/** @lends cc.ContainerStrategy# */{
 
     _setupContainer: function (view, w, h) {
         var frame = view._frame;
-        if (cc.view._autoFullScreen && cc.sys.isMobile && frame === document.documentElement) {
-            // Automatically full screen when user touches on mobile version
-            cc.screen.autoFullScreen(frame);
-        }
 
         var locCanvasElement = cc._canvas, locContainer = cc.container;
         // Setup container
@@ -867,7 +900,7 @@ cc.ContainerStrategy = cc.Class.extend(/** @lends cc.ContainerStrategy# */{
         // Setup pixel ratio for retina display
         var devicePixelRatio = view._devicePixelRatio = 1;
         if (view.isRetinaEnabled())
-            devicePixelRatio = view._devicePixelRatio = window.devicePixelRatio || 1;
+            devicePixelRatio = view._devicePixelRatio = Math.min(2, window.devicePixelRatio || 1);
         // Setup canvas
         locCanvasElement.width = w * devicePixelRatio;
         locCanvasElement.height = h * devicePixelRatio;
@@ -931,7 +964,7 @@ cc.ContentStrategy = cc.Class.extend(/** @lends cc.ContentStrategy# */{
                                contentW, contentH);
 
         // Translate the content
-        if (cc._renderType === cc._RENDER_TYPE_CANVAS){
+        if (cc._renderType === cc.game.RENDER_TYPE_CANVAS){
             //TODO: modify something for setTransform
             //cc._renderContext.translate(viewport.x, viewport.y + contentH);
         }

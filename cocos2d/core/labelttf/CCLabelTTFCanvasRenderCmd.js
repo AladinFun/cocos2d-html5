@@ -197,7 +197,7 @@ cc.LabelTTF._firsrEnglish = /^[a-zA-Z0-9ÄÖÜäöüßéèçàùêâîôû]/;
             OffsetYArray.push(yOffset);
         }
         var tmpStatus = {
-            contextTransform:cc.v2f(dx,dy),
+            contextTransform:cc.p(dx,dy),
             xOffset:xOffset,
             OffsetYArray:OffsetYArray
         };
@@ -211,7 +211,7 @@ cc.LabelTTF._firsrEnglish = /^[a-zA-Z0-9ÄÖÜäöüßéèçàùêâîôû]/;
         context.setTransform(1, 0, 0, 1, locStatus.contextTransform.x, locStatus.contextTransform.y);
         var xOffset = locStatus.xOffset;
         var yOffsetArray = locStatus.OffsetYArray;
-        this.drawLabels(context, xOffset, yOffsetArray)
+        this.drawLabels(context, xOffset, yOffsetArray);
     };
 
     proto._checkWarp = function (strArr, i, maxWidth) {
@@ -264,6 +264,7 @@ cc.LabelTTF._firsrEnglish = /^[a-zA-Z0-9ÄÖÜäöüßéèçàùêâîôû]/;
                 if (cc.LabelTTF._symbolRex.test(sLine || tmpText)) {
                     result = cc.LabelTTF._lastWordRex.exec(sText);
                     fuzzyLen -= result ? result[0].length : 0;
+                    if (fuzzyLen === 0) fuzzyLen = 1;
 
                     sLine = text.substr(fuzzyLen);
                     sText = text.substr(0, fuzzyLen);
@@ -287,17 +288,10 @@ cc.LabelTTF._firsrEnglish = /^[a-zA-Z0-9ÄÖÜäöüßéèçàùêâîôû]/;
 
     proto.updateStatus = function () {
         var flags = cc.Node._dirtyFlags, locFlag = this._dirtyFlag;
-        var colorDirty = locFlag & flags.colorDirty,
-            opacityDirty = locFlag & flags.opacityDirty;
 
-        if (colorDirty)
-            this._updateDisplayColor();
-        if (opacityDirty)
-            this._updateDisplayOpacity();
-
-        if(colorDirty || opacityDirty){
-            this._updateColor();
-        }else if(locFlag & flags.textDirty)
+        cc.Node.RenderCmd.prototype.updateStatus.call(this);
+        
+        if (locFlag & flags.textDirty)
             this._updateTexture();
 
         if (this._dirtyFlag & flags.transformDirty){
@@ -308,33 +302,13 @@ cc.LabelTTF._firsrEnglish = /^[a-zA-Z0-9ÄÖÜäöüßéèçàùêâîôû]/;
 
     proto._syncStatus = function (parentCmd) {
         var flags = cc.Node._dirtyFlags, locFlag = this._dirtyFlag;
-        var parentNode = parentCmd ? parentCmd._node : null;
-
-        if(parentNode && parentNode._cascadeColorEnabled && (parentCmd._dirtyFlag & flags.colorDirty))
-            locFlag |= flags.colorDirty;
-
-        if(parentNode && parentNode._cascadeOpacityEnabled && (parentCmd._dirtyFlag & flags.opacityDirty))
-            locFlag |= flags.opacityDirty;
-
-        if(parentCmd && (parentCmd._dirtyFlag & flags.transformDirty))
-            locFlag |= flags.transformDirty;
-
-        var colorDirty = locFlag & flags.colorDirty,
-            opacityDirty = locFlag & flags.opacityDirty;
-
-        this._dirtyFlag = locFlag;
-
-        if (colorDirty)
-            this._syncDisplayColor();
-        if (opacityDirty)
-            this._syncDisplayOpacity();
-
-        if(colorDirty || opacityDirty){
-            this._updateColor();
-        }else if(locFlag & flags.textDirty)
+        
+        cc.Node.RenderCmd.prototype._syncStatus.call(this, parentCmd);
+        
+        if (locFlag & flags.textDirty)
             this._updateTexture();
 
-        if (locFlag & flags.transformDirty)                 //update the transform
+        if (cc._renderType === cc.game.RENDER_TYPE_WEBGL || locFlag & flags.transformDirty)
             this.transform(parentCmd);
     };
 
@@ -376,13 +350,13 @@ cc.LabelTTF._firsrEnglish = /^[a-zA-Z0-9ÄÖÜäöüßéèçàùêâîôû]/;
             context.fillText(line, xOffset, yOffsetArray[i]);
         }
         cc.g_NumberOfDraws++;
-    }
+    };
 })();
 
 (function(){
     cc.LabelTTF.CacheRenderCmd = function (renderable) {
         cc.LabelTTF.RenderCmd.call(this,renderable);
-        var locCanvas = this._labelCanvas = cc.newElement("canvas");
+        var locCanvas = this._labelCanvas = document.createElement("canvas");
         locCanvas.width = 1;
         locCanvas.height = 1;
         this._labelContext = locCanvas.getContext("2d");

@@ -14,11 +14,13 @@
         var node = this._node;
         if (!node._visible)
             return;
-        cc.renderer.pushRenderCommand(this);
         var currentID = node.__instanceId;
+        
+        cc.renderer.pushRenderCommand(this);
         cc.renderer._turnToCacheMode(currentID);
 
         ccui.Layout.CanvasRenderCmd.prototype.visit.call(this, parentCmd);
+
         this._dirtyFlag = 0;
         cc.renderer._turnToNormalMode();
     };
@@ -30,7 +32,9 @@
             scaleY = cc.view.getScaleY();
         var context = ctx || cc._renderContext;
         context.computeRealOffsetY();
-        
+
+        this._node.updateChildren();
+
         for (i = 0, len = locCmds.length; i < len; i++) {
             var checkNode = locCmds[i]._node;
             if(checkNode instanceof ccui.ScrollView)

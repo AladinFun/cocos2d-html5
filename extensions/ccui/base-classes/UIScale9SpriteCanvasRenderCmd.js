@@ -30,7 +30,7 @@
         this._state = ccui.Scale9Sprite.state.NORMAL;
 
         var node = this._node;
-        var locCacheCanvas = this._cacheCanvas = cc.newElement('canvas');
+        var locCacheCanvas = this._cacheCanvas = document.createElement('canvas');
         locCacheCanvas.width = 1;
         locCacheCanvas.height = 1;
         this._cacheContext = new cc.CanvasContextWrapper(locCacheCanvas.getContext("2d"));
@@ -53,12 +53,8 @@
         if (node._positionsAreDirty) {
             node._updatePositions();
             node._positionsAreDirty = false;
-            node._scale9Dirty = true;
         }
 
-        this._cacheScale9Sprite();
-
-        node._scale9Dirty = false;
         cc.Node.CanvasRenderCmd.prototype.visit.call(this, parentCmd);
     };
 
@@ -68,9 +64,7 @@
         if (node._positionsAreDirty) {
             node._updatePositions();
             node._positionsAreDirty = false;
-            node._scale9Dirty = true;
         }
-        this._cacheScale9Sprite();
 
         var children = node._children;
         for(var i=0; i<children.length; i++){
@@ -95,14 +89,36 @@
                 else
                     break;
             }
-            this._cacheScale9Sprite();
         }
         else {
             if (node._scale9Image) {
                 node._scale9Image._renderCmd._updateDisplayColor(parentColor);
                 node._scale9Image._renderCmd._updateColor();
-                this._cacheScale9Sprite();
             }
+        }
+    };
+
+    proto.updateStatus = function () {
+        var flags = cc.Node._dirtyFlags, 
+            locFlag = this._dirtyFlag;
+
+        cc.Node.RenderCmd.prototype.updateStatus.call(this);
+
+        if (locFlag & flags.cacheDirty) {
+            this._cacheScale9Sprite();
+            this._dirtyFlag = this._dirtyFlag & flags.cacheDirty ^ this._dirtyFlag;
+        }
+    };
+
+    proto._syncStatus = function (parentCmd) {
+        var flags = cc.Node._dirtyFlags, 
+            locFlag = this._dirtyFlag;
+
+        cc.Node.RenderCmd.prototype._syncStatus.call(this, parentCmd);
+        
+        if (locFlag & flags.cacheDirty) {
+            this._cacheScale9Sprite();
+            this._dirtyFlag = this._dirtyFlag & flags.cacheDirty ^ this._dirtyFlag;
         }
     };
 
@@ -156,6 +172,7 @@
         locContext.setTransform(1, 0, 0, 1, 0, 0);
         locContext.clearRect(0, 0, sizeInPixels.width, sizeInPixels.height);
         cc.renderer._renderingToCacheCanvas(wrapper, node.__instanceId, locScaleFactor, locScaleFactor);
+        cc.renderer._turnToNormalMode();
         if(selTexture && this._state === ccui.Scale9Sprite.state.GRAY)
             selTexture._switchToGray(false);
 
@@ -171,6 +188,6 @@
         if(!locScale9Image)
             return;
         this._state = state;
-        this._cacheScale9Sprite();
+        this.setDirtyFlag(cc.Node._dirtyFlags.cacheDirty);
     };
 })();

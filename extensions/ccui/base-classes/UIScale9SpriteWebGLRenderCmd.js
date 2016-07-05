@@ -44,7 +44,6 @@
         if (node._positionsAreDirty) {
             node._updatePositions();
             node._positionsAreDirty = false;
-            node._scale9Dirty = true;
         }
 
         parentCmd = parentCmd || this.getParentRenderCmd();
@@ -77,11 +76,11 @@
 
     proto.transform = function(parentCmd, recursive){
         var node = this._node;
+        parentCmd = parentCmd || this.getParentRenderCmd();
         cc.Node.WebGLRenderCmd.prototype.transform.call(this, parentCmd, recursive);
         if (node._positionsAreDirty) {
             node._updatePositions();
             node._positionsAreDirty = false;
-            node._scale9Dirty = true;
         }
         if(node._scale9Enabled) {
             var locRenderers = node._renderers;
@@ -89,11 +88,13 @@
             for(var j=0; j < protectChildLen; j++) {
                 var pchild = locRenderers[j];
                 if(pchild) {
+                    pchild._vertexZ = parentCmd._node._vertexZ;
                     var tempCmd = pchild._renderCmd;
                     tempCmd.transform(this, true);
                 }
-                else
+                else {
                     break;
+                }
             }
         }
         else {
@@ -101,38 +102,56 @@
             node._adjustScale9ImagePosition();
             node._scale9Image._renderCmd.transform(this, true);
         }
+    };
 
+    proto.setDirtyFlag = function (dirtyFlag, child) {
+        // ignore cache dirty, it's only for canvas
+        if (dirtyFlag === cc.Node._dirtyFlags.cacheDirty)
+            dirtyFlag = cc.Node._dirtyFlags.transformDirty;
+        cc.Node.RenderCmd.prototype.setDirtyFlag.call(this, dirtyFlag, child);
+    };
+
+    proto._syncStatus = function (parentCmd){
+        cc.Node.WebGLRenderCmd.prototype._syncStatus.call(this, parentCmd);
+        this._updateDisplayColor(this._displayedColor);
+        this._updateDisplayOpacity(this._displayedOpacity);
     };
 
     proto._updateDisplayColor = function(parentColor){
         cc.Node.WebGLRenderCmd.prototype._updateDisplayColor.call(this, parentColor);
-
-        var scale9Image = this._node._scale9Image;
-        if(scale9Image){
-            var scaleChildren = scale9Image.getChildren();
-            for (var i = 0; i < scaleChildren.length; i++) {
-                var selChild = scaleChildren[i];
-                if (selChild){
-                    selChild._renderCmd._updateDisplayColor(parentColor);
-                    selChild._renderCmd._updateColor();
-                }
+        var node = this._node;
+        var scale9Image = node._scale9Image;
+        parentColor = this._displayedColor;
+        if(node._scale9Enabled) {
+            var pChildren = node._renderers;
+            for(var i=0; i<pChildren.length; i++) {
+                pChildren[i]._renderCmd._updateDisplayColor(parentColor);
+                pChildren[i]._renderCmd._updateColor();
             }
+        }
+        else {
+            scale9Image._renderCmd._updateDisplayColor(parentColor);
+            scale9Image._renderCmd._updateColor();
         }
     };
 
-    proto._updateDisplayOpacity = function(parentColor){
-        cc.Node.WebGLRenderCmd.prototype._updateDisplayOpacity.call(this, parentColor);
-
-        var scale9Image = this._node._scale9Image;
-        if(scale9Image){
-            var scaleChildren = scale9Image.getChildren();
-            for (var i = 0; i < scaleChildren.length; i++) {
-                var selChild = scaleChildren[i];
-                if (selChild){
-                    selChild._renderCmd._updateDisplayOpacity(parentColor);
-                    selChild._renderCmd._updateColor();
-                }
+    proto._updateDisplayOpacity = function(parentOpacity){
+        cc.Node.WebGLRenderCmd.prototype._updateDisplayOpacity.call(this, parentOpacity);
+        var node = this._node;
+        var scale9Image = node._scale9Image;
+        parentOpacity = this._displayedOpacity;
+        if(node._scale9Enabled) {
+            var pChildren = node._renderers;
+            for(var i=0; i<pChildren.length; i++)
+            {
+                pChildren[i]._renderCmd._updateDisplayOpacity(parentOpacity);
+                pChildren[i]._renderCmd._updateColor();
             }
+        }
+        else
+        {
+            scale9Image._renderCmd._updateDisplayOpacity(parentOpacity);
+            scale9Image._renderCmd._updateColor();
         }
     };
 

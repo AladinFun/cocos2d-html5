@@ -53,7 +53,7 @@ cc.GridBase = cc.Class.extend(/** @lends cc.GridBase# */{
      * @param {cc.Rect} rect
      */
     ctor:function (gridSize, texture, flipped, rect) {
-        cc._checkWebGLRenderMode();
+        cc.sys._checkWebGLRenderMode();
         this._active=false;
         this._reuseGrid=0;
         this._gridSize=null;
@@ -238,6 +238,8 @@ cc.GridBase = cc.Class.extend(/** @lends cc.GridBase# */{
         this._directorProjection = cc.director.getProjection();
 
         //this.set2DProjection();    //TODO why?
+        var size = cc.director.getWinSizeInPixels();
+        gl.viewport(0, 0, size.width , size.height);
         this._grabber.beforeRender(this._texture);
     },
 
@@ -246,6 +248,7 @@ cc.GridBase = cc.Class.extend(/** @lends cc.GridBase# */{
 
         // restore projection
         //cc.director.setProjection(this._directorProjection);
+        cc.director.setViewport();
 
         if (target && target.getCamera().isDirty()) {
             var offset = target.getAnchorPointInPoints();
@@ -449,12 +452,14 @@ cc.Grid3D = cc.GridBase.extend(/** @lends cc.Grid3D# */{
 
     blit:function (target) {
         var n = this._gridSize.width * this._gridSize.height;
-        cc.glEnableVertexAttribs(cc.VERTEX_ATTRIB_FLAG_POSITION | cc.VERTEX_ATTRIB_FLAG_TEX_COORDS);
         this._shaderProgram.use();
         //this._shaderProgram.setUniformsForBuiltins();
         this._shaderProgram._setUniformForMVPMatrixWithMat4(target._renderCmd._stackMatrix);
 
         var gl = cc._renderContext, locDirty = this._dirty;
+
+        gl.enableVertexAttribArray(cc.VERTEX_ATTRIB_POSITION);
+        gl.enableVertexAttribArray(cc.VERTEX_ATTRIB_TEX_COORDS);
         //
         // Attributes
         //
@@ -715,7 +720,8 @@ cc.TiledGrid3D = cc.GridBase.extend(/** @lends cc.TiledGrid3D# */{
         // Attributes
         //
         var gl = cc._renderContext, locDirty = this._dirty;
-        cc.glEnableVertexAttribs(cc.VERTEX_ATTRIB_FLAG_POSITION | cc.VERTEX_ATTRIB_FLAG_TEX_COORDS);
+        gl.enableVertexAttribArray(cc.VERTEX_ATTRIB_POSITION);
+        gl.enableVertexAttribArray(cc.VERTEX_ATTRIB_TEX_COORDS);
 
         // position
         gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);

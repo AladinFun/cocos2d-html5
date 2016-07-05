@@ -21,24 +21,31 @@
         cc.renderer._turnToCacheMode(currentID);
 
         ccui.Layout.WebGLRenderCmd.prototype.visit.call(this, parentCmd);
+        // Need to update children after do layout
+        node.updateChildren();
 
         this._dirtyFlag = 0;
         cc.renderer._turnToNormalMode();
     };
 
     proto.rendering = function(ctx){
-        var currentID = this._node.__instanceId;
-        var locCmds = cc.renderer._cacheToBufferCmds[currentID],
-            i,
-            len;
-        var context = ctx || cc._renderContext;
+        var currentID = this._node.__instanceId,
+            locCmds = cc.renderer._cacheToBufferCmds[currentID],
+            i, len, checkNode,
+            context = ctx || cc._renderContext;
+        if (!locCmds) {
+            return;
+        }
+
+        this._node.updateChildren();
+
         for (i = 0, len = locCmds.length; i < len; i++) {
-            var checkNode = locCmds[i]._node;
+            checkNode = locCmds[i]._node;
             if(checkNode instanceof ccui.ScrollView)
                 continue;
             if(checkNode && checkNode._parent && checkNode._parent._inViewRect === false)
                 continue;
             locCmds[i].rendering(context);
         }
-    }
+    };
 })();
