@@ -40,6 +40,7 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
     _buttonClickedRenderer: null,
     _buttonDisableRenderer: null,
     _titleRenderer: null,
+    _titleRendererOffset: null,
 
     _normalFileName: "",
     _clickedFileName: "",
@@ -131,11 +132,17 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
         this._buttonDisableRenderer = new cc.Sprite();
         this._titleRenderer = new cc.LabelTTF("");
         this._titleRenderer.setAnchorPoint(0.5, 0.5);
+        this._titleRendererOffset = cc.p(0, 0);
 
         this.addProtectedChild(this._buttonNormalRenderer, ccui.Button.NORMAL_RENDERER_ZORDER, -1);
         this.addProtectedChild(this._buttonClickedRenderer, ccui.Button.PRESSED_RENDERER_ZORDER, -1);
         this.addProtectedChild(this._buttonDisableRenderer, ccui.Button.DISABLED_RENDERER_ZORDER, -1);
         this.addProtectedChild(this._titleRenderer, ccui.Button.TITLE_RENDERER_ZORDER, -1);
+    },
+
+    setTitleRendererOffset : function(x, y) {
+        this._titleRendererOffset.x = x;
+        this._titleRendererOffset.y = y;
     },
 
     /**
@@ -725,7 +732,7 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
     },
 
     _updateTitleLocation: function(){
-        this._titleRenderer.setPosition(this._contentSize.width * 0.5, this._contentSize.height * 0.5);
+        this._titleRenderer.setPosition(this._contentSize.width * 0.5 + this._titleRendererOffset.x, this._contentSize.height * 0.5 + this._titleRendererOffset.y);
     },
 
     /**
