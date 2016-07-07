@@ -125,6 +125,7 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
         this.addProtectedChild(this._titleRenderer, ccui.Button.TITLE_RENDERER_ZORDER, -1);
     },
 
+    // set label offset
     setTitleRendererOffset : function(x, y) {
         this._titleRendererOffset.x = x;
         this._titleRendererOffset.y = y;
