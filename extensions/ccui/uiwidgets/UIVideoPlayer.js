@@ -338,14 +338,22 @@ ccui.VideoPlayer.EventType = {
 })(ccui.VideoPlayer);
 
 (function(polyfill){
+
+    var RenderCmd = null;
+    if (cc._renderType === cc.game.RENDER_TYPE_WEBGL) {
+        RenderCmd = cc.Node.WebGLRenderCmd;
+    } else {
+        RenderCmd = cc.Node.CanvasRenderCmd;
+    }
+    
     ccui.VideoPlayer.RenderCmd = function(node){
-        cc.Node.CanvasRenderCmd.call(this, node);
+        RenderCmd.call(this, node);
         this._listener = null;
         this._url = "";
         this.initStyle();
     };
-
-    var proto = ccui.VideoPlayer.RenderCmd.prototype = Object.create(cc.Node.CanvasRenderCmd.prototype);
+    
+    var proto = ccui.VideoPlayer.RenderCmd.prototype = Object.create(RenderCmd.prototype);
     proto.constructor = ccui.VideoPlayer.RenderCmd;
 
     proto.visit = function(){
@@ -371,6 +379,11 @@ ccui.VideoPlayer.EventType = {
             this._listener = null;
         }
         this.updateStatus();
+    };
+
+    proto.transform = function (parentCmd, recursive) {
+        this.originTransform(parentCmd, recursive);
+        this.updateMatrix(this._worldTransform, cc.view._scaleX, cc.view._scaleY);
     };
 
     proto.updateStatus = function(){
@@ -403,7 +416,7 @@ ccui.VideoPlayer.EventType = {
     proto.updateMatrix = function(t, scaleX, scaleY){
         var node = this._node;
         if(polyfill.devicePixelRatio){
-            var dpr = window.devicePixelRatio;
+            var dpr = cc.view.getDevicePixelRatio();
             scaleX = scaleX / dpr;
             scaleY = scaleY / dpr;
         }
