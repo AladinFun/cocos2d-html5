@@ -553,6 +553,15 @@ cc.GLProgram = cc.Class.extend(/** @lends cc.GLProgram# */{
         var locObj = typeof location === 'string' ? this.getUniformLocationForName(location) : location;
         this._glContext.uniform4fv(locObj, floatArray);
     },
+    /**
+     * calls glUniformMatrix3fv
+     * @param {WebGLUniformLocation|String} location
+     * @param {Float32Array} matrixArray
+     */
+    setUniformLocationWithMatrix3fv: function (location, matrixArray) {
+        var locObj = typeof location === 'string' ? this.getUniformLocationForName(location) : location;
+        this._glContext.uniformMatrix3fv(locObj, false, matrixArray);
+    },
 
     /**
      * calls glUniformMatrix4fv
@@ -743,6 +752,7 @@ cc.GLProgram = cc.Class.extend(/** @lends cc.GLProgram# */{
 
         // Purge uniform hash
         for (var key in this._hashForUniforms) {
+            this._hashForUniforms[key].length = 0;
             delete this._hashForUniforms[key];
         }
     },

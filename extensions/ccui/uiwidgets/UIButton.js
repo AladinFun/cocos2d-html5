@@ -179,6 +179,7 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
         this._titleRenderer = new cc.LabelTTF("");
         this._titleRenderer.setAnchorPoint(0.5, 0.5);
         this._titleRendererOffset = cc.p(0, 0);
+        this._titleRenderer.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
 
         this.addProtectedChild(this._buttonNormalRenderer, ccui.Button.NORMAL_RENDERER_ZORDER, -1);
         this.addProtectedChild(this._buttonClickedRenderer, ccui.Button.PRESSED_RENDERER_ZORDER, -1);
@@ -322,6 +323,9 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
                 break;
             case ccui.Widget.PLIST_TEXTURE:
                 //SetTexture cannot load resource
+                if (normal[0] === "#") {
+                    normal = normal.substr(1, normal.length - 1);
+                }
                 normalRenderer.initWithSpriteFrameName(normal);
                 break;
             default:
@@ -371,6 +375,9 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
                 break;
             case ccui.Widget.PLIST_TEXTURE:
                 //SetTexture cannot load resource
+                if (selected[0] === "#") {
+                    selected = selected.substr(1, selected.length - 1);
+                }
                 clickedRenderer.initWithSpriteFrameName(selected);
                 break;
             default:
@@ -416,6 +423,9 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
                 break;
             case ccui.Widget.PLIST_TEXTURE:
                 //SetTexture cannot load resource
+                if (disabled[0] === "#") {
+                    disabled = disabled.substr(1, disabled.length - 1);
+                }
                 disabledRenderer.initWithSpriteFrameName(disabled);
                 break;
             default:

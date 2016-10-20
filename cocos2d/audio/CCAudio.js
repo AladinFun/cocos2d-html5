@@ -55,6 +55,10 @@
         support.USE_LOADER_EVENT = 'canplay';
     }
 
+    if (sys.os === sys.OS_IOS) {
+        support.USE_LOADER_EVENT = 'loadedmetadata';
+    }
+
     if (sys.os === sys.OS_ANDROID) {
         if (sys.browserType === sys.BROWSER_TYPE_UC) {
             support.ONE_SOURCE = true;
@@ -511,6 +515,7 @@ cc.Audio.WebAudio.prototype = {
             var audio = this._currMusic;
             if (audio) {
                 audio.stop();
+                this._currMusic = null;
                 if (releaseData)
                     cc.loader.release(audio.src);
             }
@@ -815,8 +820,9 @@ cc.Audio.WebAudio.prototype = {
          * cc.audioEngine.stopEffect(audioID);
          */
         stopEffect: function(audio){
-            if(audio)
+            if(audio) {
                 audio.stop();
+            }
         },
 
         /**
@@ -829,9 +835,10 @@ cc.Audio.WebAudio.prototype = {
             var ap = this._audioPool;
             for(var p in ap){
                 var list = ap[p];
-                for(var i=0; i<ap[p].length; i++){
+                for(var i=0; i<list.length; i++){
                     list[i].stop();
                 }
+                list.length = 0;
             }
         },
 

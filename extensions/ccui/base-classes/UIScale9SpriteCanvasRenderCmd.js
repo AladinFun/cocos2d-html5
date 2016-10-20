@@ -55,7 +55,7 @@
             node._positionsAreDirty = false;
         }
 
-        cc.Node.CanvasRenderCmd.prototype.visit.call(this, parentCmd);
+        this.originVisit(parentCmd);
     };
 
     proto.transform = function(parentCmd){
@@ -181,6 +181,7 @@
 
         if(!this._cacheSprite.getParent())
             node.addChild(this._cacheSprite, -1);
+        this._cacheSprite._renderCmd._updateColor();
     };
 
     proto.setState = function(state){

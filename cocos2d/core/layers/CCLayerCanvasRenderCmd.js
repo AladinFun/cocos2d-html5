@@ -37,6 +37,7 @@
         cc.Node.CanvasRenderCmd.call(this, renderable);
         this._isBaked = false;
         this._bakeSprite = null;
+        this._canUseDirtyRegion = true;
         this._updateCache = 2; // 2: Updated child visit 1: Rendering 0: Nothing to do
     };
 
@@ -59,7 +60,7 @@
             this._cacheDirty = true;
             if(this._updateCache === 0)
                 this._updateCache = 2;
-            this._dirtyFlag = this._dirtyFlag & flags.orderDirty ^ this._dirtyFlag;
+            this._dirtyFlag = locFlag & flags.orderDirty ^ locFlag;
         }
 
         cc.Node.RenderCmd.prototype.updateStatus.call(this);
@@ -71,7 +72,7 @@
             this._cacheDirty = true;
             if(this._updateCache === 0)
                 this._updateCache = 2;
-            this._dirtyFlag = this._dirtyFlag & flags.orderDirty ^ this._dirtyFlag;
+            this._dirtyFlag = locFlag & flags.orderDirty ^ locFlag;
         }
         cc.Node.RenderCmd.prototype._syncStatus.call(this, parentCmd);
     };
@@ -160,7 +161,7 @@
 
     proto.visit = function(parentCmd){
         if(!this._isBaked){
-            cc.Node.CanvasRenderCmd.prototype.visit.call(this, parentCmd);
+            this.originVisit(parentCmd);
             return;
         }
 
@@ -244,7 +245,7 @@
             + (0 | curColor.b) + ", 1)");  //TODO: need cache the color string
 
         wrapper.setTransform(this._worldTransform, scaleX, scaleY);
-        context.fillRect(0, 0, locWidth * scaleX, -locHeight * scaleY);
+        context.fillRect(0, 0, locWidth , -locHeight );
 
         cc.g_NumberOfDraws++;
     };
@@ -309,7 +310,7 @@
 
     proto.visit = function(parentCmd){
         if(!this._isBaked){
-            cc.Node.CanvasRenderCmd.prototype.visit.call(this);
+            this.originVisit();
             return;
         }
 
@@ -355,18 +356,6 @@
  * cc.LayerGradient's rendering objects of Canvas
  */
 (function(){
-    cc.LayerGradient.RenderCmd = {
-        updateStatus: function () {
-            var flags = cc.Node._dirtyFlags, locFlag = this._dirtyFlag;
-            if (locFlag & flags.gradientDirty) {
-                this._dirtyFlag |= flags.colorDirty;
-                this._dirtyFlag = this._dirtyFlag & flags.gradientDirty ^ this._dirtyFlag;
-            }
-
-            cc.Node.RenderCmd.prototype.updateStatus.call(this);
-        }
-    };
-
     cc.LayerGradient.CanvasRenderCmd = function(renderable){
         cc.LayerColor.CanvasRenderCmd.call(this, renderable);
         this._needDraw = true;
@@ -376,7 +365,6 @@
         this._endStopStr = null;
     };
     var proto = cc.LayerGradient.CanvasRenderCmd.prototype = Object.create(cc.LayerColor.CanvasRenderCmd.prototype);
-    cc.inject(cc.LayerGradient.RenderCmd, proto);
     proto.constructor = cc.LayerGradient.CanvasRenderCmd;
 
     proto.rendering = function (ctx, scaleX, scaleY) {
@@ -390,7 +378,7 @@
         var locWidth = node._contentSize.width, locHeight = node._contentSize.height;
         wrapper.setCompositeOperation(this._blendFuncStr);
         wrapper.setGlobalAlpha(opacity);
-        var gradient = context.createLinearGradient(this._startPoint.x*scaleX, this._startPoint.y*scaleY, this._endPoint.x*scaleX, this._endPoint.y*scaleY);
+        var gradient = context.createLinearGradient(this._startPoint.x, this._startPoint.y, this._endPoint.x, this._endPoint.y);
 
         if(node._colorStops){  //Should always fall here now
              for(var i=0; i < node._colorStops.length; i++) {
@@ -405,8 +393,18 @@
         wrapper.setFillStyle(gradient);
 
         wrapper.setTransform(this._worldTransform, scaleX, scaleY);
-        context.fillRect(0, 0, locWidth * scaleX, -locHeight * scaleY);
+        context.fillRect(0, 0, locWidth , -locHeight );
         cc.g_NumberOfDraws++;
+    };
+
+    proto.updateStatus = function () {
+        var flags = cc.Node._dirtyFlags, locFlag = this._dirtyFlag;
+        if (locFlag & flags.gradientDirty) {
+            this._dirtyFlag |= flags.colorDirty;
+            this._dirtyFlag = locFlag & flags.gradientDirty ^ locFlag;
+        }
+
+        cc.Node.RenderCmd.prototype.updateStatus.call(this);
     };
 
     proto._syncStatus = function (parentCmd) {
@@ -419,11 +417,10 @@
         cc.Node.RenderCmd.prototype._syncStatus.call(this, parentCmd);
     };
 
-    proto._updateColor = function(){
+    proto._updateColor = function() {
         var node = this._node;
         var contentSize = node._contentSize;
         var tWidth = contentSize.width * 0.5, tHeight = contentSize.height * 0.5;
-        this._dirtyFlag = this._dirtyFlag & cc.Node._dirtyFlags.gradientDirty ^ this._dirtyFlag;
 
         //fix the bug of gradient layer
         var angle = cc.pAngleSigned(cc.p(0, -1), node._alongVector);
