@@ -72,6 +72,7 @@ cc.SpriteFrame = cc.Class.extend(/** @lends cc.SpriteFrame# */{
         this._textureFilename = "";
         this._texture = null;
         this._textureLoaded = false;
+        this._spName = filename;
 
         if(filename !== undefined && rect !== undefined ){
             if(rotated === undefined || offset === undefined || originalSize === undefined)

@@ -397,7 +397,8 @@ ccui.Text = ccui.Widget.extend(/** @lends ccui.Text# */{
             this.setFontSize(uiLabel.getFontSize());
             this.setString(uiLabel.getString());
             this.setTouchScaleChangeEnabled(uiLabel.touchScaleEnabled);
-            this.setTextAreaSize(uiLabel._textAreaSize);
+            var size_for_textArea = new cc.Size(uiLabel._textAreaSize.width,uiLabel._textAreaSize.height);
+            this.setTextAreaSize(size_for_textArea);
             this.setTextHorizontalAlignment(uiLabel._labelRenderer.getHorizontalAlignment());
             this.setTextVerticalAlignment(uiLabel._labelRenderer.getVerticalAlignment());
             this.setContentSize(uiLabel.getContentSize());

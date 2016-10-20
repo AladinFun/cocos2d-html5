@@ -198,7 +198,9 @@ spine.Slot.prototype = {
     _attachmentTime: 0,
     attachment: null,
     attachmentVertices: [],
+    isLocked : false,
     setAttachment: function (attachment) {
+        if(this.isLocked) return;
         this.attachment = attachment;
         this._attachmentTime = this.bone.skeleton.time;
         this.attachmentVertices.length = 0;
@@ -210,6 +212,7 @@ spine.Slot.prototype = {
         return this.bone.skeleton.time - this._attachmentTime;
     },
     setToSetupPose: function () {
+        if(this.isLocked) return;
         var data = this.data;
         this.r = data.r;
         this.g = data.g;
@@ -2134,7 +2137,7 @@ spine.SkeletonJson.prototype = {
                 frameIndex++;
             }
             timelines.push(timeline);
-            duration = Math.max(duration, timeline.frames[timeline.frameCount * 3 - 3]);
+            duration = Math.max(duration, timeline.frames[timeline.getFrameCount() * 3 - 3]);
         }
 
         var ffd = map["ffd"];
@@ -2195,7 +2198,7 @@ spine.SkeletonJson.prototype = {
                         frameIndex++;
                     }
                     timelines[timelines.length] = timeline;
-                    duration = Math.max(duration, timeline.frames[timeline.frameCount - 1]);
+                    duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
                 }
             }
         }

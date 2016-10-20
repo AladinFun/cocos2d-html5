@@ -108,6 +108,49 @@ ccui.CheckBox = ccui.Widget.extend(/** @lends ccui.CheckBox# */{
         this.loadTextures(backGround, backGroundSelected, cross, backGroundDisabled, frontCrossDisabled, texType);
     },
 
+    onEnter : function(){
+        this._super();
+         if('mouse' in cc.sys.capabilities) {
+            // this._addMouseLisener();
+         }
+    },
+
+    _addMouseLisener : function(){
+         cc.eventManager.addListener({
+            event: cc.EventListener.MOUSE,
+            onMouseDown: this.onMouseDown.bind(this),
+            onMouseMove: this.onMouseMove.bind(this),
+            onMouseUp: this.onMouseUp.bind(this)
+        },this)
+     },
+
+     onMouseDown : function(event){},
+
+     ishowPoint : false,
+
+     onMouseMove : function(event){
+        if (this.isVisible() && this.isEnabled() && this._isAncestorsEnabled() && this._isAncestorsVisible(this)){
+            var pos = event.getLocation(), target = event.getCurrentTarget();
+            if(this.hitTest(pos)){
+                if(!this.ishowPoint){
+                    this.ishowPoint = true;
+                    cc._canvas.style.cursor = "pointer";
+                }     
+            }else{
+                if(this.ishowPoint){
+                    this.ishowPoint = false;
+                    cc._canvas.style.cursor = "default";
+                }  
+            }
+        }       
+     },
+
+     onMouseUp : function(event){
+
+     },
+
+
+
     _initRenderer: function () {
         this._backGroundBoxRenderer = new cc.Sprite();
         this._backGroundSelectedBoxRenderer = new cc.Sprite();

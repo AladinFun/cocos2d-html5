@@ -69,7 +69,7 @@ ccui.Layout = ccui.Widget.extend(/** @lends ccui.Layout# */{
     __passFocusToChild: true,                                                  //on default, it will pass the focus to the next nearest widget
     _isFocusPassing:false,                                                      //when finding the next focused widget, use this variable to pass focus between layout & widget
     _isInterceptTouch: false,
-
+    _mouseOver : false,
     /**
      * Allocates and initializes an UILayout.
      * Constructor of ccui.Layout
@@ -113,7 +113,53 @@ ccui.Layout = ccui.Widget.extend(/** @lends ccui.Layout# */{
             this._clippingStencil.onEnter();
         this._doLayoutDirty = true;
         this._clippingRectDirty = true;
+
+        if('mouse' in cc.sys.capabilities) {
+            if(this._mouseOver){
+                // this._addMouseLisener();
+            }
+         }
     },
+    setMouseOver : function(flag){
+        if(flag){
+            this._mouseOver = flag;
+        }
+        
+    },
+     _addMouseLisener : function(){
+         cc.eventManager.addListener({
+            event: cc.EventListener.MOUSE,
+            onMouseDown: this.onMouseDown.bind(this),
+            onMouseMove: this.onMouseMove.bind(this),
+            onMouseUp: this.onMouseUp.bind(this)
+        },this)
+     },
+
+     onMouseDown : function(event){},
+
+     ishowPoint : false,
+
+     onMouseMove : function(event){
+        if (this.isVisible() && this.isEnabled() && this._isAncestorsEnabled() && this._isAncestorsVisible(this)){
+            var pos = event.getLocation(), target = event.getCurrentTarget();
+            if(this.hitTest(pos)){
+                if(!this.ishowPoint){
+                    this.ishowPoint = true;
+                    cc._canvas.style.cursor = "pointer";
+                }     
+            }else{
+                if(this.ishowPoint){
+                    this.ishowPoint = false;
+                    cc._canvas.style.cursor = "default";
+                }  
+            }
+        }       
+     },
+
+     onMouseUp : function(event){
+
+     },
+
 
     /**
      *  Calls its parent's onExit, and calls its clippingStencil's onExit if clippingStencil isn't null.

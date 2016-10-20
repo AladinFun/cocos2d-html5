@@ -1421,22 +1421,27 @@ cc.ParticleSystem = cc.Node.extend(/** @lends cc.ParticleSystem# */{
 
                 // texture
                 // Try to get the texture from the cache
+                var textureData = locValueForKey("textureImageData", dictionary);
                 var textureName = locValueForKey("textureFileName", dictionary);
                 var imgPath = cc.path.changeBasename(this._plistFile, cc.path.mainFileName(this._plistFile) + textureName);
+                if(!textureData || textureData.length === 0) {
+                    imgPath = cc.path.changeBasename(this._plistFile, textureName);
+                }
                 var tex = cc.textureCache.getTextureForKey(imgPath);
-
                 if (tex) {
                     this.setTexture(tex);
                 } else {
-                    var textureData = locValueForKey("textureImageData", dictionary);
-
                     if (!textureData || textureData.length === 0) {
                         tex = cc.textureCache.addImage(imgPath);
                         if (!tex)
                             return false;
                         this.setTexture(tex);
                     } else {
-                        buffer = cc.unzipBase64AsArray(textureData, 1);
+                        try {
+                            buffer = cc.unzipBase64AsArray(textureData, 1);
+                        } catch(err) {
+                            cc.log("unzipBase64AsArray error:" + err + err.stack);
+                        }
                         if (!buffer) {
                             cc.log("cc.ParticleSystem: error decoding or ungzipping textureImageData");
                             return false;

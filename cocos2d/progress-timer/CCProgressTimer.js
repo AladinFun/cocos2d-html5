@@ -161,6 +161,11 @@ cc.ProgressTimer = cc.Node.extend(/** @lends cc.ProgressTimer# */{
      */
     setPercentage:function (percentage) {
         if (this._percentage !== percentage) {
+            var difference = Math.abs(percentage - this._percentage);
+            //if(difference > 10){
+            //    cc.log("setPercentage Error " + new Error().stack);
+            //}
+
             this._percentage = cc.clampf(percentage, 0, 100);
             this._renderCmd._updateProgress();
         }

@@ -83,6 +83,10 @@ cc.TransitionScene = cc.Scene.extend(/** @lends cc.TransitionScene# */{
             this.initWithDuration(t, scene);
     },
 
+    getInScene:function(){
+        return this._inScene;
+    },
+
     //private
     _setNewScene:function (dt) {
         this.unschedule(this._setNewScene);

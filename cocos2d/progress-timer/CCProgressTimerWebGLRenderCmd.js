@@ -474,7 +474,6 @@
         var quad = locSprite.quad;
         var min = cc.p(quad.bl.texCoords.u, quad.bl.texCoords.v);
         var max = cc.p(quad.tr.texCoords.u, quad.tr.texCoords.v);
-
         //  Fix bug #1303 so that progress timer handles sprite frame texture rotation
         if (locSprite.textureRectRotated) {
             var temp = alpha.x;

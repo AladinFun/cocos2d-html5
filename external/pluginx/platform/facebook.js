@@ -29,7 +29,7 @@
  * @property {String} name - plugin name
  * @property {String} version - API version
  */
-plugin.extend('facebook', {
+plugin.extend('facebook', window.FB ? {
     name: "",
     version: "",
     _userInfo: null,
@@ -59,20 +59,20 @@ plugin.extend('facebook', {
      * @type {Object}
      */
     AppEvent: {
-        'ACTIVATED_APP': FB.AppEvents.EventNames.ACTIVATED_APP,
-        'COMPLETED_REGISTRATION': FB.AppEvents.EventNames.COMPLETED_REGISTRATION,
-        'VIEWED_CONTENT': FB.AppEvents.EventNames.VIEWED_CONTENT,
-        'SEARCHED': FB.AppEvents.EventNames.SEARCHED,
-        'RATED': FB.AppEvents.EventNames.RATED,
-        'COMPLETED_TUTORIAL': FB.AppEvents.EventNames.COMPLETED_TUTORIAL,
-        'ADDED_TO_CART': FB.AppEvents.EventNames.ADDED_TO_CART,
-        'ADDED_TO_WISHLIST': FB.AppEvents.EventNames.ADDED_TO_WISHLIST,
-        'INITIATED_CHECKOUT': FB.AppEvents.EventNames.INITIATED_CHECKOUT,
-        'ADDED_PAYMENT_INFO': FB.AppEvents.EventNames.ADDED_PAYMENT_INFO,
-        'PURCHASED': FB.AppEvents.EventNames.PURCHASED,
-        'ACHIEVED_LEVEL': FB.AppEvents.EventNames.ACHIEVED_LEVEL,
-        'UNLOCKED_ACHIEVEMENT': FB.AppEvents.EventNames.UNLOCKED_ACHIEVEMENT,
-        'SPENT_CREDITS': FB.AppEvents.EventNames.SPENT_CREDITS
+        'ACTIVATED_APP': FB && FB.AppEvents.EventNames.ACTIVATED_APP,
+        'COMPLETED_REGISTRATION': FB && FB.AppEvents.EventNames.COMPLETED_REGISTRATION,
+        'VIEWED_CONTENT': FB && FB.AppEvents.EventNames.VIEWED_CONTENT,
+        'SEARCHED': FB && FB.AppEvents.EventNames.SEARCHED,
+        'RATED': FB && FB.AppEvents.EventNames.RATED,
+        'COMPLETED_TUTORIAL': FB && FB.AppEvents.EventNames.COMPLETED_TUTORIAL,
+        'ADDED_TO_CART': FB && FB.AppEvents.EventNames.ADDED_TO_CART,
+        'ADDED_TO_WISHLIST': FB && FB.AppEvents.EventNames.ADDED_TO_WISHLIST,
+        'INITIATED_CHECKOUT': FB && FB.AppEvents.EventNames.INITIATED_CHECKOUT,
+        'ADDED_PAYMENT_INFO': FB && FB.AppEvents.EventNames.ADDED_PAYMENT_INFO,
+        'PURCHASED': FB && FB.AppEvents.EventNames.PURCHASED,
+        'ACHIEVED_LEVEL': FB && FB.AppEvents.EventNames.ACHIEVED_LEVEL,
+        'UNLOCKED_ACHIEVEMENT': FB && FB.AppEvents.EventNames.UNLOCKED_ACHIEVEMENT,
+        'SPENT_CREDITS': FB && FB.AppEvents.EventNames.SPENT_CREDITS
     },
 
     /**
@@ -81,17 +81,17 @@ plugin.extend('facebook', {
      * @type {Object}
      */
     AppEventParam: {
-        'CURRENCY': FB.AppEvents.ParameterNames.CURRENCY,
-        'REGISTRATION_METHOD': FB.AppEvents.ParameterNames.REGISTRATION_METHOD,
-        'CONTENT_TYPE': FB.AppEvents.ParameterNames.CONTENT_TYPE,
-        'CONTENT_ID': FB.AppEvents.ParameterNames.CONTENT_ID,
-        'SEARCH_STRING': FB.AppEvents.ParameterNames.SEARCH_STRING,
-        'SUCCESS': FB.AppEvents.ParameterNames.SUCCESS,
-        'MAX_RATING_VALUE': FB.AppEvents.ParameterNames.MAX_RATING_VALUE,
-        'PAYMENT_INFO_AVAILABLE': FB.AppEvents.ParameterNames.PAYMENT_INFO_AVAILABLE,
-        'NUM_ITEMS': FB.AppEvents.ParameterNames.NUM_ITEMS,
-        'LEVEL': FB.AppEvents.ParameterNames.LEVEL,
-        'DESCRIPTION': FB.AppEvents.ParameterNames.DESCRIPTION
+        'CURRENCY': FB && FB.AppEvents.ParameterNames.CURRENCY,
+        'REGISTRATION_METHOD': FB && FB.AppEvents.ParameterNames.REGISTRATION_METHOD,
+        'CONTENT_TYPE': FB && FB.AppEvents.ParameterNames.CONTENT_TYPE,
+        'CONTENT_ID': FB && FB.AppEvents.ParameterNames.CONTENT_ID,
+        'SEARCH_STRING': FB && FB.AppEvents.ParameterNames.SEARCH_STRING,
+        'SUCCESS': FB && FB.AppEvents.ParameterNames.SUCCESS,
+        'MAX_RATING_VALUE': FB && FB.AppEvents.ParameterNames.MAX_RATING_VALUE,
+        'PAYMENT_INFO_AVAILABLE': FB && FB.AppEvents.ParameterNames.PAYMENT_INFO_AVAILABLE,
+        'NUM_ITEMS': FB && FB.AppEvents.ParameterNames.NUM_ITEMS,
+        'LEVEL': FB && FB.AppEvents.ParameterNames.LEVEL,
+        'DESCRIPTION': FB && FB.AppEvents.ParameterNames.DESCRIPTION
     },
 
     /**
@@ -106,7 +106,7 @@ plugin.extend('facebook', {
 
     _checkLoginStatus: function() {
         var self = this;
-        FB.getLoginStatus(function (response) {
+        FB && FB.getLoginStatus(function (response) {
             if (response && response.status === 'connected') {
                 //login
                 self._isLoggedIn = true;
@@ -164,7 +164,7 @@ plugin.extend('facebook', {
             permissions.push("public_profile");
         }
         var permissionsStr = permissions.join(',');
-        FB.login(function (response) {
+        FB && FB.login(function (response) {
             if (response['authResponse']) {
                 //save user info
                 self._isLoggedIn = true;
@@ -207,7 +207,7 @@ plugin.extend('facebook', {
      */
     logout: function (callback) {
         var self = this;
-        FB.logout(function (response) {
+        FB && FB.logout(function (response) {
             if (response['authResponse']) {
                 // user is now logged out
                 self._isLoggedIn = false;
@@ -233,7 +233,7 @@ plugin.extend('facebook', {
     _requestPermissions: function (permissions, callback) {
         var permissionsStr = permissions.join(',');
         var self = this;
-        FB.login(function (response) {
+        FB && FB.login(function (response) {
             if (response['authResponse']) {
                 var permissList = response['authResponse']['grantedScopes'].split(",");
                 //save user info
@@ -278,7 +278,7 @@ plugin.extend('facebook', {
     },
 
     _share: function (info, callback) {
-        FB.ui({
+        FB && FB.ui({
                 method: 'share',
                 name: info['title'],
                 caption: info['caption'],
@@ -373,7 +373,7 @@ plugin.extend('facebook', {
             }
         }
 
-        FB.ui(info,
+        FB && FB.ui(info,
             function (response) {
                 if (response && typeof callback === 'function') {
                     if (response['post_id'] || response['success']) {
@@ -424,7 +424,7 @@ plugin.extend('facebook', {
             callback = params;
             params = {};
         }
-        FB.api(path, httpmethod, params, function (response) {
+        FB && FB.api(path, httpmethod, params, function (response) {
             if (response.error) {
                 typeof callback === 'function' && callback(response['error']['code'], {
                     error_message: response['error']['message'] || 'Unknown error'
@@ -436,7 +436,7 @@ plugin.extend('facebook', {
     },
 
     _getPermissionList: function (callback) {
-        FB.api("/me/permissions", function (response) {
+        FB && FB.api("/me/permissions", function (response) {
             if (response['data']) {
                 var permissionList = [];
                 for (var i = 0; i < response['data'].length; i++) {
@@ -473,7 +473,7 @@ plugin.extend('facebook', {
             info['method'] = 'pay';
             info['action'] = 'purchaseitem';
 
-            FB.ui(info, function (response) {
+            FB && FB.ui(info, function (response) {
                 if (response['error_code']) {
                     callback(response['error_code'] || 1, {
                         error_message: response['error_message'] || response['error_msg'] || 'Unknown error'
@@ -500,7 +500,7 @@ plugin.extend('facebook', {
 
         info['method'] = "apprequests";
 
-        FB.ui(info,
+        FB && FB.ui(info,
             function (response) {
                 if (response) {
                     if (response['error_code']) {
@@ -528,13 +528,13 @@ plugin.extend('facebook', {
     logEvent: function (eventName, valueToSum, parameters) {
         if (eventName == undefined) return;
         if (valueToSum === undefined && parameters === undefined) {
-            FB.AppEvents.logEvent(eventName, null, null);
+            FB && FB.AppEvents.logEvent(eventName, null, null);
         } else if (typeof valueToSum === "number" && parameters === undefined) {
-            FB.AppEvents.logEvent(eventName, valueToSum);
+            FB && FB.AppEvents.logEvent(eventName, valueToSum);
         } else if (typeof valueToSum === "object" && parameters === undefined) {
-            FB.AppEvents.logEvent(eventName, null, valueToSum);
+            FB && FB.AppEvents.logEvent(eventName, null, valueToSum);
         } else {
-            FB.AppEvents.logEvent(eventName, valueToSum, parameters);
+            FB && FB.AppEvents.logEvent(eventName, valueToSum, parameters);
         }
     },
 
@@ -542,7 +542,7 @@ plugin.extend('facebook', {
      * Activate App
      */
     activateApp: function () {
-        FB.AppEvents.activateApp();
+        FB && FB.AppEvents.activateApp();
     },
 
     /**
@@ -552,6 +552,6 @@ plugin.extend('facebook', {
      * @param {Object} param Supplemental parameters
      */
     logPurchase:function(amount, currency, param){
-        FB.AppEvents.logPurchase(amount, currency, param);
+        FB && FB.AppEvents.logPurchase(amount, currency, param);
     }
-});
+} : {});

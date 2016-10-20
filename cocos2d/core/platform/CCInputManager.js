@@ -472,6 +472,23 @@ cc.inputManager = /** @lends cc.inputManager# */{
                 event.preventDefault();
             }, false);
 
+            element.addEventListener("mouseout", function (event) {
+                if(prohibition) return;
+                selfPointer._mousePressed = false;
+
+                var pos = selfPointer.getHTMLElementPosition(element);
+                var location = selfPointer.getPointByEvent(event, pos);
+
+                selfPointer.handleTouchesEnd([selfPointer.getTouchByXY(location.x, location.y, pos)]);
+
+                var mouseEvent = selfPointer.getMouseEvent(location,pos,cc.EventMouse.UP);
+                mouseEvent.setButton(event.button);
+                cc.eventManager.dispatchEvent(mouseEvent);
+
+                event.stopPropagation();
+                event.preventDefault();
+            }, false);
+
             element.addEventListener("mousemove", function (event) {
                 if(prohibition) return;
 

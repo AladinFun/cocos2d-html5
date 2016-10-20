@@ -1326,8 +1326,10 @@
             var plist = json["Plist"];
             if(plist){
                 if(cc.loader.getRes(resourcePath + plist)){
-                    loadedPlist[resourcePath + plist] = true;
-                    cc.spriteFrameCache.addSpriteFrames(resourcePath + plist);
+                    if(!loadedPlist[resourcePath + plist]){
+                        loadedPlist[resourcePath + plist] = true;
+                        cc.spriteFrameCache.addSpriteFrames(resourcePath + plist);
+                    }
                 }else{
                     if(!loadedPlist[resourcePath + plist] && !cc.spriteFrameCache.getSpriteFrame(path))
                         cc.log("%s need to be preloaded", resourcePath + plist);

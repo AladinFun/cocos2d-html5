@@ -845,7 +845,8 @@ ccui.Scale9Sprite = cc.Scale9Sprite = cc.Node.extend(/** @lends ccui.Scale9Sprit
         if(sprite) {
             if(!sprite.getSpriteFrame())
                 return false;
-            if(!this._scale9Image)
+
+            // if(!this._scale9Image)这行应注释掉，否则不能更新_scale9Image，当loadTexture切换纹理的时候会出问题
                 this._scale9Image = sprite;
         }
         if(!this._scale9Image)  return false;
@@ -879,10 +880,11 @@ ccui.Scale9Sprite = cc.Scale9Sprite = cc.Node.extend(/** @lends ccui.Scale9Sprit
         this._originalSize = size;
         this._preferredSize = size;
         this._capInsetsInternal = capInsets;
-        if(this._scale9Enabled)
+        if(this._scale9Enabled){
             this.createSlicedSprites();
-        else
+        } else {
             this._scale9Image.initWithTexture(tmpTexture, this._spriteRect, this._spriteFrameRotated);
+        }
 
         this.setState(this._brightState);
         this.setContentSize(size);

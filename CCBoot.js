@@ -788,6 +788,9 @@ cc.loader = (function () {
          * @param {function} [cb] arguments are : err, txt
          */
         loadTxt: function (url, cb) {
+            if(this._aliases && this._aliases[url]) {
+                url = this._aliases[url];
+            }
             if (!cc._isNodeJs) {
                 var xhr = this.getXMLHttpRequest(),
                     errInfo = "load " + url + " failed!";
@@ -818,6 +821,9 @@ cc.loader = (function () {
             }
         },
         _loadTxtSync: function (url) {
+            if(this._aliases && this._aliases[url]) {
+                url = this._aliases[url];
+            }
             if (!cc._isNodeJs) {
                 var xhr = this.getXMLHttpRequest();
                 xhr.open("GET", url, false);
@@ -1043,6 +1049,7 @@ cc.loader = (function () {
                 url = basePath;
                 var type = path.extname(url);
                 type = type ? type.toLowerCase() : "";
+                cc.log("getUrl+type="+type);
                 var loader = _register[type];
                 if (!loader)
                     basePath = self.resPath;
@@ -2037,14 +2044,16 @@ function _determineRenderType(config) {
     cc._supportRender = false;
 
     if (userRenderMode === 0) {
-        if (cc.sys.capabilities["opengl"]) {
-            cc._renderType = cc.game.RENDER_TYPE_WEBGL;
-            cc._supportRender = true;
-        }
-        else if (cc.sys.capabilities["canvas"]) {
-            cc._renderType = cc.game.RENDER_TYPE_CANVAS;
-            cc._supportRender = true;
-        }
+        cc._renderType = cc.game.RENDER_TYPE_WEBGL;
+        cc._supportRender = true;
+        // if (cc.sys.capabilities["opengl"]) {
+        //     cc._renderType = cc.game.RENDER_TYPE_WEBGL;
+        //     cc._supportRender = true;
+        // }
+        // else if (cc.sys.capabilities["canvas"]) {
+        //     cc._renderType = cc.game.RENDER_TYPE_CANVAS;
+        //     cc._supportRender = true;
+        // }
     }
     else if (userRenderMode === 1 && cc.sys.capabilities["canvas"]) {
         cc._renderType = cc.game.RENDER_TYPE_CANVAS;
@@ -2575,12 +2584,12 @@ cc.game = /** @lends cc.game# */{
                     if(_src){
                         _resPath = /(.*)\//.exec(_src)[0];
                         cc.loader.resPath = _resPath;
-                        _src = cc.path.join(_resPath, 'project.json');
+                        _src = cc.path.join(_resPath, window.PROJECT_JSON || "project.json");
                     }
                     txt = cc.loader._loadTxtSync(_src);
                 }
                 if(!txt){
-                    txt = cc.loader._loadTxtSync("project.json");
+                    txt = cc.loader._loadTxtSync(window.PROJECT_JSON || "project.json");
                 }
                 data = JSON.parse(txt);
             } catch (e) {

@@ -422,11 +422,12 @@ cc.Audio.WebAudio.prototype = {
 
             // 加载统一使用dom
             var dom = document.createElement('audio');
-            for (var i=0; i<num; i++) {
-                var source = document.createElement('source');
-                source.src = cc.path.changeExtname(realUrl, typeList[i]);
-                dom.appendChild(source);
-            }
+            //for (var i=0; i<num; i++) {
+            var source = document.createElement('source');
+                //source.src = cc.path.changeExtname(realUrl, typeList[i]);
+            source.src = realUrl;
+            dom.appendChild(source);
+            //}
 
             audio.setElement(dom);
 
@@ -678,6 +679,9 @@ cc.Audio.WebAudio.prototype = {
 
             }
 
+            if (cc.sys.os == cc.sys.OS_IOS) {
+                return;
+            }
             loader.useWebAudio = true;
             var shouldPlay = true;
             var ctx = {};

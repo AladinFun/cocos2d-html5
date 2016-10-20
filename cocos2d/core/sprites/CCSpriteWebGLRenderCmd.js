@@ -30,7 +30,7 @@
     cc.Sprite.WebGLRenderCmd = function (renderable) {
         cc.Node.WebGLRenderCmd.call(this, renderable);
         this._needDraw = true;
-
+        // this._log = new  Error().stack;
         this._vertices = [
             {x: 0, y: 0, z: 0}, // tl
             {x: 0, y: 0, z: 0}, // bl
@@ -401,6 +401,7 @@
 
     proto._setTexture = function (texture) {
         var node = this._node;
+        //cc.log("err.stack : " + new Error().stack);
         // If batchnode, then texture id should be the same
         if (node._batchNode) {
             if(node._batchNode.texture !== texture){
@@ -543,6 +544,9 @@
         //cc.assert(!_t._batchNode, "If cc.Sprite is being rendered by cc.SpriteBatchNode, cc.Sprite#draw SHOULD NOT be called");
 
         var program = this._shaderProgram;
+        if(!program){
+            return;
+        }
         if (locTexture) {
             if (locTexture._textureLoaded) {
                 program.use();
@@ -569,6 +573,9 @@
                 gl.drawArrays(gl.TRIANGLE_STRIP, this._bufferOffset / (this.vertexBytesPerUnit/4), 4);
             }
         } else {
+            if(!program){
+                // cc.log("test:"+this._log);
+            }
             program.use();
             program._updateProjectionUniform();
 

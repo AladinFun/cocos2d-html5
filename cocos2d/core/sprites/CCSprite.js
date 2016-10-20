@@ -128,6 +128,7 @@ cc.Sprite = cc.Node.extend(/** @lends cc.Sprite# */{
         self._unflippedOffsetPositionFromCenter = cc.p(0, 0);
         self._blendFunc = {src: cc.BLEND_SRC, dst: cc.BLEND_DST};
         self._rect = cc.rect(0, 0, 0, 0);
+        self._spName = String(fileName);
 
         self._softInit(fileName, rect, rotated);
     },

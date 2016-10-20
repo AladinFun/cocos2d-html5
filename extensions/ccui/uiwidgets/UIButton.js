@@ -40,6 +40,7 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
     _buttonClickedRenderer: null,
     _buttonDisableRenderer: null,
     _titleRenderer: null,
+    _titleRendererOffset: null,
 
     _normalFileName: "",
     _clickedFileName: "",
@@ -81,7 +82,7 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
     _fontName: "Thonburi",
     _fontSize: 12,
     _type: 0,
-
+    _lightFlag : false,
     /**
      * Allocates and initializes a UIButton.
      * Constructor of ccui.Button. override it to extend the construction behavior, remember to call "this._super()" in the extended "ctor" function.
@@ -109,6 +110,67 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
         }
     },
 
+    onEnter : function(){
+        this._super();
+         if('mouse' in cc.sys.capabilities) {
+            // this._addMouseLisener();
+         }
+    },
+    onMouseOverLight : function(){
+
+    },
+    _addMouseLisener : function(){
+         cc.eventManager.addListener({
+            event: cc.EventListener.MOUSE,
+            onMouseDown: this.onMouseDown.bind(this),
+            onMouseMove: this.onMouseMove.bind(this),
+            onMouseUp: this.onMouseUp.bind(this)
+        },this)
+     },
+
+     mouseOnMoveCb : null,
+     setMouseOnOverCb : function(cb) {
+        this.mouseOnOverCb = cb;
+     },
+     setMouseOnoutCb : function(cb){
+        this.mouseOnoutCb = cb;
+     },
+     onMouseDown : function(event){},
+
+     isShowPoint : false,
+
+     onMouseMove : function(event){
+        if (this.isVisible() && this.isEnabled() && this._isAncestorsEnabled() && this._isAncestorsVisible(this)){
+            var pos = event.getLocation(), target = event.getCurrentTarget();
+            var worldPos = this.convertToNodeSpace(pos);
+            // cc.log("---------worldPos.x="+worldPos.x+"---y="+worldPos.y);
+            var size = this.getContentSize();
+            // cc.log("---------size.width="+size.width+"---size.height="+size.height);
+            if(this.hitTest(pos)){
+                if(!this.isShowPoint){
+                    this.isShowPoint = true;
+                    cc._canvas.style.cursor = "pointer";
+                    if (this.mouseOnOverCb && cc.isFunction(this.mouseOnOverCb)) {
+                        this.mouseOnOverCb(this);
+                    }
+                }     
+            }else{
+                if(this.isShowPoint){
+                    this.isShowPoint = false;
+                    cc._canvas.style.cursor = "default";
+                    if (this.mouseOnoutCb && cc.isFunction(this.mouseOnoutCb)) {
+                        this.mouseOnoutCb(this);
+                    }
+                   
+                }  
+            }
+        }       
+     },
+
+     onMouseUp : function(event){
+
+     },
+
     _initRenderer: function () {
         //todo create Scale9Sprite
         this._buttonNormalRenderer = new cc.Sprite();
@@ -116,11 +178,18 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
         this._buttonDisableRenderer = new cc.Sprite();
         this._titleRenderer = new cc.LabelTTF("");
         this._titleRenderer.setAnchorPoint(0.5, 0.5);
+        this._titleRendererOffset = cc.p(0, 0);
 
         this.addProtectedChild(this._buttonNormalRenderer, ccui.Button.NORMAL_RENDERER_ZORDER, -1);
         this.addProtectedChild(this._buttonClickedRenderer, ccui.Button.PRESSED_RENDERER_ZORDER, -1);
         this.addProtectedChild(this._buttonDisableRenderer, ccui.Button.DISABLED_RENDERER_ZORDER, -1);
         this.addProtectedChild(this._titleRenderer, ccui.Button.TITLE_RENDERER_ZORDER, -1);
+    },
+
+    // set label offset
+    setTitleRendererOffset : function(x, y) {
+        this._titleRendererOffset.x = x;
+        this._titleRendererOffset.y = y;
     },
 
     /**
@@ -710,7 +779,7 @@ ccui.Button = ccui.Widget.extend(/** @lends ccui.Button# */{
     },
 
     _updateTitleLocation: function(){
-        this._titleRenderer.setPosition(this._contentSize.width * 0.5, this._contentSize.height * 0.5);
+        this._titleRenderer.setPosition(this._contentSize.width * 0.5 + this._titleRendererOffset.x, this._contentSize.height * 0.5 + this._titleRendererOffset.y);
     },
 
     /**
