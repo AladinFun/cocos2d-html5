@@ -39,7 +39,7 @@
  */
 (function(){
 
-    var DEBUG = false;
+    var DEBUG = true;
 
     var sys = cc.sys;
     var version = sys.browserVersion;
@@ -49,7 +49,7 @@
     var supportWebAudio = !!(window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 
     var support = {ONLY_ONE: false, WEB_AUDIO: supportWebAudio, DELAY_CREATE_CTX: false, ONE_SOURCE: false };
-
+    cc.log("test: support webaudio " + supportWebAudio);
     if (sys.browserType === sys.BROWSER_TYPE_FIREFOX) {
         support.DELAY_CREATE_CTX = true;
         support.USE_LOADER_EVENT = 'canplay';
@@ -350,15 +350,22 @@ cc.Audio.WebAudio.prototype = {
             request.open("GET", url, true);
             request.responseType = "arraybuffer";
 
+            //fix bug of webAudio
+            var buf,sync=0,retry=0;
             // Our asynchronous callback
             request.onload = function () {
+                buf = request.response;
+                sync = 0;
+                retry =0;
+
                 context["decodeAudioData"](request.response, function(buffer){
                     //success
                     cb(null, buffer);
                     //audio.setBuffer(buffer);
-                }, function(){
+                }, function(err){
                     //error
                     cb('decode error - ' + url);
+                    cc.log("decode error :" + err)
                 });
             };
 
@@ -684,14 +691,17 @@ cc.Audio.WebAudio.prototype = {
 
             }
 
-            if (cc.sys.os == cc.sys.OS_IOS) {
-                return;
-            }
             loader.useWebAudio = true;
             var shouldPlay = true;
             var ctx = {};
             ctx.audio = audio;
+
+            this.startTime = new Date().getTime();
+            var self = this;
             cc.loader.load(url, function (audio) {
+                var endTime = new Date().getTime();
+                if ((endTime -self.startTime) > 80)
+                    return;
                 if(shouldPlay) {
                     ctx.audio = cc.loader.getRes(url);
                     ctx.audio = ctx.audio.cloneNode();
