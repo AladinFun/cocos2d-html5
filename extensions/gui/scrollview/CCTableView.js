@@ -618,7 +618,6 @@ cc.TableView = cc.ScrollView.extend(/** @lends cc.TableView# */{
     },
 
     onTouchEnded:function (touch, event) {
-        cc.log("tableview touch ended");
         if (!this.isVisible())
             return;
 
@@ -641,7 +640,6 @@ cc.TableView = cc.ScrollView.extend(/** @lends cc.TableView# */{
     },
 
     onTouchBegan:function(touch, event){
-        cc.log("tableview touch began");
         for (var c = this; c != null; c = c.parent) {
             if (!c.isVisible())
                 return false;
@@ -672,7 +670,6 @@ cc.TableView = cc.ScrollView.extend(/** @lends cc.TableView# */{
     },
 
     onTouchMoved: function(touch, event){
-        cc.log("tableview touch moved");
         cc.ScrollView.prototype.onTouchMoved.call(this, touch, event);
 
         if (this._touchedCell && this.isTouchMoved()) {

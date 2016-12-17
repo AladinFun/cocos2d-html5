@@ -1774,6 +1774,7 @@ spine.AnimationState.prototype = {
     /** May be null. */
     getCurrent: function (trackIndex) {
         if (trackIndex >= this.tracks.length) return null;
+        trackIndex = trackIndex || this.tracks.length - 1;
         return this.tracks[trackIndex];
     }
 };

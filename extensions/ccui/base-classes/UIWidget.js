@@ -558,7 +558,7 @@ ccui.Widget = ccui.ProtectedNode.extend(/** @lends ccui.Widget# */{
 
         this._ignoreSize = ignore;
         this.setContentSize( ignore ? this.getVirtualRendererSize() : this._customSize );
-        //this._onSizeChanged();
+        this._onSizeChanged();
     },
 
     /**

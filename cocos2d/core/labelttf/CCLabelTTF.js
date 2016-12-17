@@ -199,6 +199,10 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
     setLineHeight: function (lineHeight) {
         this._lineHeight = lineHeight;
     },
+    
+    setLineSpacing :function () {
+        return;
+    },
 
     /**
      * Returns the text of the label

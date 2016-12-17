@@ -191,11 +191,11 @@
     proto._updateRegionAttachmentQuad = function(self, slot, quad, premultipliedAlpha) {
         var vertices = {};
         self.computeVertices(slot.bone.skeleton.x, slot.bone.skeleton.y, slot.bone, vertices);
-        var a = slot.bone.skeleton.a * slot.a * attachment.a * 255;
+        var a = slot.bone.skeleton.a * slot.a * slot.attachment.a * 255;
         var multiplier = premultipliedAlpha ? a : 255;
-        var r = slot.bone.skeleton.r * slot.r * attachment.r * multiplier;
-        var g = slot.bone.skeleton.g * slot.g * attachment.g * multiplier;
-        var b = slot.bone.skeleton.b * slot.b * attachment.b * multiplier;
+        var r = slot.bone.skeleton.r * slot.r * slot.attachment.r * multiplier;
+        var g = slot.bone.skeleton.g * slot.g * slot.attachment.g * multiplier;
+        var b = slot.bone.skeleton.b * slot.b * slot.attachment.b * multiplier;
 
         quad.bl.colors.r = quad.tl.colors.r = quad.tr.colors.r = quad.br.colors.r = r;
         quad.bl.colors.g = quad.tl.colors.g = quad.tr.colors.g = quad.br.colors.g = g;
