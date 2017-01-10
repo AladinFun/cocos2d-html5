@@ -334,8 +334,8 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
         this._shadowColor.b = shadowColor.b;
 
         var x, y, a, b;
-        x = offset.width || offset.x || 0;
-        y = offset.height || offset.y || 0;
+        x = offset && offset.width || offset && offset.x || 0;
+        y = offset && offset.height || offset && offset.y || 0;
         a = (shadowColor.a != null) ? (shadowColor.a / 255) : 0.5;
         b = blurRadius;
 
