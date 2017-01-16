@@ -49,7 +49,6 @@
     var supportWebAudio = !!(window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 
     var support = {ONLY_ONE: false, WEB_AUDIO: supportWebAudio, DELAY_CREATE_CTX: false, ONE_SOURCE: false};
-    cc.log("test: support webaudio " + supportWebAudio);
     if (sys.browserType === sys.BROWSER_TYPE_FIREFOX) {
         support.DELAY_CREATE_CTX = true;
         support.USE_LOADER_EVENT = 'canplay';
@@ -358,7 +357,7 @@ cc.Audio.WebAudio.prototype = {
 
 
 
-        useWebAudio: false,
+        useWebAudio: true,
 
         loadBuffer: function (url, cb) {
             if (!SWA) return; // WebAudio Buffer
