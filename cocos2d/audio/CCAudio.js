@@ -393,7 +393,6 @@ cc.Audio.WebAudio.prototype = {
         },
 
         load: function (realUrl, url, res, cb) {
-
             if (support.length === 0)
                 return cb("can not support audio!");
 
@@ -728,7 +727,7 @@ cc.Audio.WebAudio.prototype = {
                     effectList.push(ctx.audio);
                 }
             });
-            loader.useWebAudio = false;
+            // loader.useWebAudio = false;
 
             return ctx.audio || {
                     pause: function () {
