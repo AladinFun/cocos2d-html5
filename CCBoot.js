@@ -2792,6 +2792,14 @@ cc.game = /** @lends cc.game# */{
             win.addEventListener("focus", onShow, false);
         }
 
+        document.addEventListener("qbrowserVisibilityChange",function (e) {
+            if(e.hidden) {
+                onHidden();
+            } else {
+                onShow();
+            }
+        });
+
         if(navigator.userAgent.indexOf("MicroMessenger") > -1){
             win.onfocus = function(){ onShow() };
         }
