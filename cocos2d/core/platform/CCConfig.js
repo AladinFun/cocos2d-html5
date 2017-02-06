@@ -31,7 +31,7 @@
  * @type {String}
  * @name cc.ENGINE_VERSION
  */
-window["CocosEngine"] = cc.ENGINE_VERSION = "Cocos2d-JS v3.13";
+window["CocosEngine"] = cc.ENGINE_VERSION = "Cocos2d-JS v3.14";
 
 /**
  * <p>
@@ -56,7 +56,7 @@ window["CocosEngine"] = cc.ENGINE_VERSION = "Cocos2d-JS v3.13";
  * @constant
  * @type {Number}
  */
-cc.FIX_ARTIFACTS_BY_STRECHING_TEXEL = 0;
+cc.FIX_ARTIFACTS_BY_STRECHING_TEXEL = 1;
 
 /**
  * Position of the FPS (Default: 0,0 (bottom-left corner))<br/>

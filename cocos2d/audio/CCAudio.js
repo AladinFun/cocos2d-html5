@@ -39,7 +39,7 @@
  */
 (function () {
 
-    var DEBUG = true;
+    var DEBUG = false;
 
     var sys = cc.sys;
     var version = sys.browserVersion;
@@ -49,6 +49,7 @@
     var supportWebAudio = !!(window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 
     var support = {ONLY_ONE: false, WEB_AUDIO: supportWebAudio, DELAY_CREATE_CTX: false, ONE_SOURCE: false};
+
     if (sys.browserType === sys.BROWSER_TYPE_FIREFOX) {
         support.DELAY_CREATE_CTX = true;
         support.USE_LOADER_EVENT = 'canplay';
@@ -82,6 +83,7 @@
  * Encapsulate DOM and webAudio
  */
 cc.Audio = cc.Class.extend({
+    interruptPlay: false,
     src: null,
     _element: null,
     _AUDIO_TYPE: "AUDIO",
@@ -109,16 +111,18 @@ cc.Audio = cc.Class.extend({
     },
 
     play: function (offset, loop) {
-        cc.log("audio type:" + this._AUDIO_TYPE + " src: " + this.src);
-        if (!this._element) return;
+        if (!this._element) {
+            this.interruptPlay = false;
+            return;
+        }
         this._element.loop = loop;
         this._element.play();
         if (this._AUDIO_TYPE === 'AUDIO' && this._element.paused) {
             this.stop();
-            cc.Audio.touchPlayList.push({loop: loop, offset: offset, audio: this._element});
+            cc.Audio.touchPlayList.push({ loop: loop, offset: offset, audio: this._element });
         }
 
-        if (cc.Audio.bindTouch === false) {
+        if (cc.Audio.bindTouch === false && this._element.paused) {
             cc.Audio.bindTouch = true;
             // Listen to the touchstart body event and play the audio when necessary.
             cc.game.canvas.addEventListener('touchstart', cc.Audio.touchStart);
@@ -131,7 +135,10 @@ cc.Audio = cc.Class.extend({
     },
 
     stop: function () {
-        if (!this._element) return;
+        if (!this._element) {
+            this.interruptPlay = true;
+            return;
+        }
         this._element.pause();
         try {
             this._element.currentTime = 0;
@@ -140,12 +147,18 @@ cc.Audio = cc.Class.extend({
     },
 
     pause: function () {
-        if (!this._element) return;
+        if (!this._element) {
+            this.interruptPlay = true;
+            return;
+        }
         this._element.pause();
     },
 
     resume: function () {
-        if (!this._element) return;
+        if (!this._element) {
+            this.interruptPlay = false;
+            return;
+        }
         this._element.play();
     },
 
@@ -309,9 +322,8 @@ cc.Audio.WebAudio.prototype = {
         var audio = this._currentSource;
         this._currentSource = null;
         this._startTime = -1;
-        if (audio) {
+        if (audio)
             audio.stop(0);
-        }
     }
 };
 
@@ -355,44 +367,47 @@ cc.Audio.WebAudio.prototype = {
 
         cache: {},
 
-
-
         useWebAudio: true,
 
         loadBuffer: function (url, cb) {
             if (!SWA) return; // WebAudio Buffer
 
-            var request = new XMLHttpRequest();
+            var request = cc.loader.getXMLHttpRequest();
             request.open("GET", url, true);
             request.responseType = "arraybuffer";
 
-            //fix bug of webAudio
-            var buf, sync = 0, retry = 0;
             // Our asynchronous callback
             request.onload = function () {
-                buf = request.response;
-                sync = 0;
-                retry = 0;
-
+                if (request._timeoutId >= 0) {
+                    clearTimeout(request._timeoutId);
+                }
                 context["decodeAudioData"](request.response, function (buffer) {
                     //success
                     cb(null, buffer);
                     //audio.setBuffer(buffer);
-                }, function (err) {
+                }, function () {
                     //error
                     cb('decode error - ' + url);
-                    cc.log("decode error :" + err)
                 });
             };
 
             request.onerror = function () {
                 cb('request error - ' + url);
             };
+            if (request.ontimeout === undefined) {
+                request._timeoutId = setTimeout(function () {
+                    request.ontimeout();
+                }, request.timeout);
+            }
+            request.ontimeout = function () {
+                cb('request timeout - ' + url);
+            };
 
             request.send();
         },
 
         load: function (realUrl, url, res, cb) {
+
             if (support.length === 0)
                 return cb("can not support audio!");
 
@@ -400,15 +415,13 @@ cc.Audio.WebAudio.prototype = {
             if (audio)
                 return cb(null, audio);
 
-            var i;
-
             if (cc.loader.audioPath)
                 realUrl = cc.path.join(cc.loader.audioPath, realUrl);
 
             var extname = cc.path.extname(realUrl);
 
             var typeList = [extname];
-            for (i = 0; i < support.length; i++) {
+            for (var i = 0; i < support.length; i++) {
                 if (extname !== support[i]) {
                     typeList.push(support[i]);
                 }
@@ -448,12 +461,12 @@ cc.Audio.WebAudio.prototype = {
 
             // 加载统一使用dom
             var dom = document.createElement('audio');
-            //for (var i=0; i<num; i++) {
-            var source = document.createElement('source');
-            //source.src = cc.path.changeExtname(realUrl, typeList[i]);
-            source.src = realUrl;
-            dom.appendChild(source);
-            //}
+            // for (var i = 0; i < num; i++) {
+                var source = document.createElement('source');
+                // source.src = cc.path.changeExtname(realUrl, typeList[i]);
+                source.src = realUrl;
+                dom.appendChild(source);
+            // }
 
             audio.setElement(dom);
 
@@ -512,17 +525,23 @@ cc.Audio.WebAudio.prototype = {
          * //example
          * cc.audioEngine.playMusic(path, false);
          */
-        playMusic: function (url, loop) {
+        playMusic: function(url, loop){
             var bgMusic = this._currMusic;
             if (bgMusic && bgMusic.getPlaying()) {
                 bgMusic.stop();
             }
+            var musicVolume = this._musicVolume;
             var audio = cc.loader.getRes(url);
             if (!audio) {
-                cc.loader.load(url);
+                cc.loader.load(url, function () {
+                    if (!audio.getPlaying() && !audio.interruptPlay) {
+                        audio.setVolume(musicVolume);
+                        audio.play(0, loop || false);
+                    }
+                });
                 audio = cc.loader.getRes(url);
             }
-            audio.setVolume(this._musicVolume);
+            audio.setVolume(musicVolume);
             audio.play(0, loop || false);
 
             this._currMusic = audio;
@@ -535,9 +554,15 @@ cc.Audio.WebAudio.prototype = {
          * //example
          * cc.audioEngine.stopMusic();
          */
-        stopMusic: function (releaseData) {
+        stopMusic: function(releaseData){
             var audio = this._currMusic;
             if (audio) {
+                var list = cc.Audio.touchPlayList;
+                for (var i=list.length-1; i>=0; --i) {
+                    if (this[i] && this[i].audio === audio._element)
+                        list.splice(i, 1);
+                }
+
                 audio.stop();
                 this._currMusic = null;
                 if (releaseData)
@@ -648,6 +673,7 @@ cc.Audio.WebAudio.prototype = {
          * var soundId = cc.audioEngine.playEffect(path);
          */
         playEffect: function (url, loop) {
+
             if (SWB && this._currMusic && this._currMusic.getPlaying()) {
                 cc.log('Browser is only allowed to play one audio');
                 return null;
@@ -658,9 +684,7 @@ cc.Audio.WebAudio.prototype = {
                 effectList = this._audioPool[url] = [];
             }
 
-            var i;
-
-            for (i = 0; i < effectList.length; i++) {
+            for (var i = 0; i < effectList.length; i++) {
                 if (!effectList[i].getPlaying()) {
                     break;
                 }
@@ -709,7 +733,14 @@ cc.Audio.WebAudio.prototype = {
             }
 
             loader.useWebAudio = true;
-            var shouldPlay = true;
+            // cc.loader.load(url, function (audio) {
+            //     audio = cc.loader.getRes(url);
+            //     audio = audio.cloneNode();
+            //     audio.setVolume(cc.audioEngine._effectVolume);
+            //     audio.play(0, loop || false);
+            //     effectList.push(audio);
+            // });
+            // loader.useWebAudio = false;
             var ctx = {};
             ctx.audio = audio;
 
@@ -719,25 +750,21 @@ cc.Audio.WebAudio.prototype = {
                 // var endTime = new Date().getTime();
                 // if ((endTime -self.startTime) > 80)
                 //     return;
-                if (shouldPlay) {
-                    ctx.audio = cc.loader.getRes(url);
-                    ctx.audio = ctx.audio.cloneNode();
-                    ctx.audio.setVolume(cc.audioEngine._effectVolume);
-                    ctx.audio.play(0, loop || false);
-                    effectList.push(ctx.audio);
-                }
+                ctx.audio = cc.loader.getRes(url);
+                ctx.audio = ctx.audio.cloneNode();
+                ctx.audio.setVolume(cc.audioEngine._effectVolume);
+                ctx.audio.play(0, loop || false);
+                effectList.push(ctx.audio);
             });
             // loader.useWebAudio = false;
 
             return ctx.audio || {
                     pause: function () {
-                        shouldPlay = false;
                         if (ctx.audio) {
                             ctx.audio.pause();
                         }
                     },
                     stop: function () {
-                        shouldPlay = false;
                         if (ctx.audio) {
                             ctx.audio.stop();
                         }
@@ -867,6 +894,7 @@ cc.Audio.WebAudio.prototype = {
                 }
                 list.length = 0;
             }
+            ap.length = 0;
         },
 
         /**
@@ -883,7 +911,12 @@ cc.Audio.WebAudio.prototype = {
 
             cc.loader.release(url);
             var pool = this._audioPool[url];
-            if (pool) pool.length = 0;
+            if (pool) {
+                for (var i = 0; i < pool.length; i++) {
+                    pool[i].stop();
+                }
+                pool.length = 0;
+            }
             delete this._audioPool[url];
         },
 

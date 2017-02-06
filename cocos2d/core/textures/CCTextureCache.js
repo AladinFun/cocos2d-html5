@@ -108,7 +108,7 @@ cc.textureCache = /** @lends cc.textureCache# */{
      * //example
      * var key = cc.textureCache.getTextureForKey("hello.png");
      */
-    getTextureForKey: function(textureKeyName){
+    getTextureForKey: function (textureKeyName) {
         return this._textures[textureKeyName] || this._textures[cc.loader._getAliase(textureKeyName)];
     },
 
@@ -214,10 +214,8 @@ cc.textureCache = /** @lends cc.textureCache# */{
     removeTextureForKey: function (textureKeyName) {
         if (textureKeyName == null)
             return;
-        if (this._textures[textureKeyName]) {
-            this._textures[textureKeyName].releaseTexture();
+        if (this._textures[textureKeyName])
             delete(this._textures[textureKeyName]);
-        }
     },
 
     //addImage move to Canvas/WebGL
@@ -345,13 +343,12 @@ cc.game.addEventListener(cc.game.EVENT_RENDERER_INITED, function () {
             //remove judge
             var tex = locTexs[url] || locTexs[cc.loader._getAliase(url)];
             if (tex) {
-                if(tex.isLoaded()) {
+                if (tex.isLoaded()) {
                     cb && cb.call(target, tex);
                     return tex;
                 }
-                else
-                {
-                    tex.addEventListener("load", function(){
+                else {
+                    tex.addEventListener("load", function () {
                         cb && cb.call(target, tex);
                     }, target);
                     return tex;
@@ -361,7 +358,7 @@ cc.game.addEventListener(cc.game.EVENT_RENDERER_INITED, function () {
             tex = locTexs[url] = new cc.Texture2D();
             tex.url = url;
             var basePath = cc.loader.getBasePath ? cc.loader.getBasePath() : cc.loader.resPath;
-            cc.loader.loadImg(url, function (err, img) {
+            cc.loader.loadImg(cc.path.join(basePath || "", url), function (err, img) {
                 if (err)
                     return cb && cb.call(target, err);
 
