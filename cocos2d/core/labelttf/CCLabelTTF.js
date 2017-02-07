@@ -199,8 +199,8 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
     setLineHeight: function (lineHeight) {
         this._lineHeight = lineHeight;
     },
-
-    setLineSpacing: function () {
+    
+    setLineSpacing :function () {
         return;
     },
 
@@ -326,9 +326,6 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
     },
 
     _enableShadow: function (shadowColor, offset, blurRadius) {
-        if(!offset) {
-            offset = {};
-        }
         if (!this._shadowColor) {
             this._shadowColor = cc.color(255, 255, 255, 128);
         }
@@ -337,8 +334,8 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
         this._shadowColor.b = shadowColor.b;
 
         var x, y, a, b;
-        x = offset.width || offset.x || 0;
-        y = offset.height || offset.y || 0;
+        x = offset && offset.width || offset && offset.x || 0;
+        y = offset && offset.height || offset && offset.y || 0;
         a = (shadowColor.a != null) ? (shadowColor.a / 255) : 0.5;
         b = blurRadius;
 
@@ -519,8 +516,8 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
         this._fontName = textDefinition.fontName;
         this._fontSize = textDefinition.fontSize || 12;
 
-        if (textDefinition.lineHeight)
-            this._lineHeight = textDefinition.lineHeight;
+        if(textDefinition.lineHeight)
+            this._lineHeight = textDefinition.lineHeight
         else
             this._lineHeight = this._fontSize;
 
@@ -544,7 +541,7 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
         if (mustUpdateTexture)
             this._renderCmd._updateTexture();
         var flags = cc.Node._dirtyFlags;
-        this._renderCmd.setDirtyFlag(flags.colorDirty | flags.opacityDirty | flags.textDirty);
+        this._renderCmd.setDirtyFlag(flags.colorDirty|flags.opacityDirty|flags.textDirty);
     },
 
     _prepareTextDefinition: function (adjustForResolution) {
@@ -617,9 +614,9 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
      * @param {Number} [scaleY=]
      */
     setScale: function (scale, scaleY) {
-        var ratio = cc.view.getDevicePixelRatio();
-        this._scaleX = scale / ratio;
-        this._scaleY = ((scaleY || scaleY === 0) ? scaleY : scale) / ratio;
+        this._scaleX = scale / cc.view.getDevicePixelRatio();
+        this._scaleY = ((scaleY || scaleY === 0) ? scaleY : scale) /
+            cc.view.getDevicePixelRatio();
         this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.transformDirty);
     },
 
@@ -813,37 +810,23 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
     getContentSize: function () {
         if (this._needUpdateTexture)
             this._renderCmd._updateTTF();
-        var ratio = cc.view.getDevicePixelRatio();
-        return cc.size( this._contentSize.width / ratio, this._contentSize.height / ratio );
+        return cc.size(this._contentSize);
     },
 
     _getWidth: function () {
         if (this._needUpdateTexture)
             this._renderCmd._updateTTF();
-        return this._contentSize.width / cc.view.getDevicePixelRatio();
+        return this._contentSize.width;
     },
     _getHeight: function () {
         if (this._needUpdateTexture)
             this._renderCmd._updateTTF();
-        return this._contentSize.height / cc.view.getDevicePixelRatio();
+        return this._contentSize.height;
     },
 
     setTextureRect: function (rect, rotated, untrimmedSize) {
-        var _t = this;
-        _t._rectRotated = rotated || false;
-        _t.setContentSize(untrimmedSize || rect);
-
-        _t.setVertexRect(rect);
-        _t._renderCmd._setTextureCoords(rect, false);
-
-        var relativeOffsetX = _t._unflippedOffsetPositionFromCenter.x, relativeOffsetY = _t._unflippedOffsetPositionFromCenter.y;
-        if (_t._flippedX)
-            relativeOffsetX = -relativeOffsetX;
-        if (_t._flippedY)
-            relativeOffsetY = -relativeOffsetY;
-        var locRect = _t._rect;
-        _t._offsetPosition.x = relativeOffsetX + (rect.width - locRect.width) / 2;
-        _t._offsetPosition.y = relativeOffsetY + (rect.height - locRect.height) / 2;
+        //set needConvert to false
+        cc.Sprite.prototype.setTextureRect.call(this, rect, rotated, untrimmedSize, false);
     },
 
     /**
@@ -864,7 +847,7 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
     },
 
     //For web only
-    _setFontStyle: function (fontStyle) {
+    _setFontStyle: function(fontStyle){
         if (this._fontStyle !== fontStyle) {
             this._fontStyle = fontStyle;
             this._renderCmd._setFontStyle(this._fontName, this._fontSize, this._fontStyle, this._fontWeight);
@@ -872,11 +855,11 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
         }
     },
 
-    _getFontStyle: function () {
+    _getFontStyle: function(){
         return this._fontStyle;
     },
 
-    _setFontWeight: function (fontWeight) {
+    _setFontWeight: function(fontWeight){
         if (this._fontWeight !== fontWeight) {
             this._fontWeight = fontWeight;
             this._renderCmd._setFontStyle(this._fontName, this._fontSize, this._fontStyle, this._fontWeight);
@@ -884,7 +867,7 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
         }
     },
 
-    _getFontWeight: function () {
+    _getFontWeight: function(){
         return this._fontWeight;
     }
 });

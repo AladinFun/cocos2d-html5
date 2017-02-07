@@ -106,8 +106,8 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
     _textureLoaded: false,
     _className: "LabelBMFont",
 
-    _createRenderCmd: function () {
-        if (cc._renderType === cc.game.RENDER_TYPE_WEBGL)
+    _createRenderCmd: function(){
+        if(cc._renderType === cc.game.RENDER_TYPE_WEBGL)
             return new cc.LabelBMFont.WebGLRenderCmd(this);
         else
             return new cc.LabelBMFont.CanvasRenderCmd(this);
@@ -119,7 +119,6 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
         } else {
             this._initialString = newString;
         }
-
         var locChildren = this._children;
         if (locChildren) {
             for (var i = 0; i < locChildren.length; i++) {
@@ -129,9 +128,7 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
             }
         }
         if (this._textureLoaded) {
-            if(this._string && this._string.length > 0) {
-                this.createFontChars();
-            }
+            this.createFontChars();
             if (needUpdateLabel)
                 this.updateLabel();
         }
@@ -227,23 +224,13 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
         if (fntFile) {
             var newConf = cc.loader.getRes(fntFile);
             if (!newConf) {
-                newConf = cc.FntFrameCache[fntFile] || cc.FntFrameCache[cc.path.basename(fntFile)];
-                if(!newConf) {
-                    cc.log("cc.LabelBMFont.initWithString(): Impossible to create font. Please check file");
-                    return false;
-                }
+                cc.log("cc.LabelBMFont.initWithString(): Impossible to create font. Please check file");
+                return false;
             }
 
             self._config = newConf;
             self._fntFile = fntFile;
-            var spriteFrameBaseName = newConf.atlasName;
-            var spriteFrame = cc.spriteFrameCache.getSpriteFrame(spriteFrameBaseName) || cc.spriteFrameCache.getSpriteFrame(cc.path.basename(spriteFrameBaseName));
-            if(spriteFrame) {
-                texture = spriteFrame.getTexture();
-                this._spriteFrame = spriteFrame;
-            } else {
-                texture = cc.textureCache.addImage(newConf.atlasName);
-            }
+            texture = cc.textureCache.addImage(newConf.atlasName);
             var locIsLoaded = texture.isLoaded();
             self._textureLoaded = locIsLoaded;
             if (!locIsLoaded) {
@@ -277,7 +264,6 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
             self.setAnchorPoint(0.5, 0.5);
 
             self.setString(theString, true);
-
             return true;
         }
         return false;
@@ -287,9 +273,6 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
      * updates the font chars based on the string to render
      */
     createFontChars: function () {
-        var locStr = this._string;
-        var stringLen = locStr ? locStr.length : 0;
-
         var self = this;
         var cmd = this._renderCmd;
         var locTexture = cmd._texture || this._texture;
@@ -302,6 +285,11 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
 
         var quantityOfLines = 1;
 
+        var locStr = self._string;
+        var stringLen = locStr ? locStr.length : 0;
+
+        if (stringLen === 0)
+            return;
 
         var i, locCfg = self._config, locKerningDict = locCfg.kerningDict,
             locCommonH = locCfg.commonHeight, locFontDict = locCfg.fontDefDictionary;
@@ -348,30 +336,15 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
             rect.x += self._imageOffset.x;
             rect.y += self._imageOffset.y;
 
-            var isRotated = false;
-            if(this._spriteFrame) {
-                var textureWidth = locTexture.width;
-                var spriteFrameRect = this._spriteFrame._rect;
-                if(!this._spriteFrame._rotated) {
-                    rect.x = rect.x + spriteFrameRect.x;
-                    rect.y = rect.y + spriteFrameRect.y;
-                } else {
-                    isRotated = true;
-                    var originalX = rect.x;
-                    rect.x = rect.y + spriteFrameRect.x;
-                    rect.y = originalX + spriteFrameRect.y;
-                }
-            }
-
             var fontChar = self.getChildByTag(i);
 
             if (!fontChar) {
                 fontChar = new cc.Sprite();
-                fontChar.initWithTexture(locTexture, rect, isRotated);
+                fontChar.initWithTexture(locTexture, rect, false);
                 fontChar._newTextureWhenChangeColor = true;
                 this.addChild(fontChar, 0, i);
             } else {
-                cmd._updateCharTexture(fontChar, rect, key, isRotated);
+                cmd._updateCharTexture(fontChar, rect, key);
             }
 
             // Apply label properties
@@ -393,7 +366,7 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
 
         //If the last character processed has an xAdvance which is less that the width of the characters image, then we need
         // to adjust the width of the string to take this into account, or the character will overlap the end of the bounding box
-        if (fontDef && fontDef.xAdvance < fontDef.rect.width)
+        if(fontDef && fontDef.xAdvance < fontDef.rect.width)
             tmpSize.width = longestLine - fontDef.xAdvance + fontDef.rect.width;
         else
             tmpSize.width = longestLine;
@@ -410,17 +383,13 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
         var self = this;
         var locChildren = self._children;
         if (locChildren) {
-            var length = locChildren.length;
-            for (var i = 0, li = length; i < li; i++) {
+            for (var i = 0, li = locChildren.length; i < li; i++) {
                 var node = locChildren[i];
                 if (node) node.visible = false;
             }
         }
-        if (self._config) {
-            if(self._string && self._string.length > 0) {
-                self.createFontChars();
-            }
-        }
+        if (self._config)
+            self.createFontChars();
 
         if (!fromUpdate)
             self.updateLabel();
@@ -465,8 +434,9 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
     },
 
     // calc the text all with in a line
-    _getCharsWidth: function (startIndex, endIndex) {
-        if (endIndex <= 0) {
+    _getCharsWidth:function (startIndex, endIndex) {
+        if (endIndex <= 0)
+        {
             return 0;
         }
         var curTextFirstSprite = this.getChildByTag(startIndex);
@@ -474,11 +444,12 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
         return this._getLetterPosXLeft(curTextLastSprite) - this._getLetterPosXLeft(curTextFirstSprite);
     },
 
-    _checkWarp: function (strArr, i, maxWidth, initStringWrapNum) {
+    _checkWarp:function (strArr, i, maxWidth, initStringWrapNum) {
         var self = this;
         var text = strArr[i];
         var curLength = 0;
-        for (var strArrIndex = 0; strArrIndex < i; strArrIndex++) {
+        for (var strArrIndex = 0; strArrIndex < i; strArrIndex++)
+        {
             curLength += strArr[strArrIndex].length;
         }
 
@@ -569,7 +540,6 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
     updateLabel: function () {
         var self = this;
         self.string = self._initialString;
-
         var i, j, characterSprite;
         // process string
         // Step 1: Make multiline
@@ -584,7 +554,8 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
                 if (oldArrLength < stringArr.length) {
                     newWrapNum++;
                 }
-                if (i > 0) {
+                if (i > 0)
+                {
                     wrapString += "\n";
                 }
                 wrapString += stringArr[i];
@@ -592,6 +563,7 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
             wrapString = wrapString + String.fromCharCode(0);
             self._setString(wrapString, false);
         }
+
         // Step 2: Make alignment
         if (self._alignment !== cc.TEXT_ALIGNMENT_LEFT) {
             i = 0;
@@ -746,9 +718,7 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
                     var self1 = this;
                     self1._textureLoaded = true;
                     self1.setTexture(sender);
-                    if(self1._string && self1._string.length > 0) {
-                        self1.createFontChars();
-                    }
+                    self1.createFontChars();
                     self1._changeTextureColor();
                     self1.updateLabel();
 
@@ -756,9 +726,7 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
                 }, self);
             } else {
                 self.setTexture(texture);
-                if(self._string && self._string.length > 0) {
-                    self.createFontChars();
-                }
+                self.createFontChars();
             }
         }
     },
@@ -771,7 +739,7 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
         return this._fntFile;
     },
 
-    setTexture: function (texture) {
+    setTexture: function(texture){
         this._texture = texture;
         this._renderCmd.setTexture(texture);
     },
@@ -798,8 +766,7 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
         this.updateLabel();
     },
 
-    _atlasNameFromFntFile: function (fntFile) {
-    },
+    _atlasNameFromFntFile: function (fntFile) {},
 
     _kerningAmountForFirst: function (first, second) {
         var ret = 0;
@@ -821,14 +788,14 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
     },
 
     //Checking whether the character is a whitespace
-    _isspace_unicode: function (ch) {
+    _isspace_unicode: function(ch){
         ch = ch.charCodeAt(0);
-        return ((ch >= 9 && ch <= 13) || ch === 32 || ch === 133 || ch === 160 || ch === 5760
-        || (ch >= 8192 && ch <= 8202) || ch === 8232 || ch === 8233 || ch === 8239
-        || ch === 8287 || ch === 12288);
+        return  ((ch >= 9 && ch <= 13) || ch === 32 || ch === 133 || ch === 160 || ch === 5760
+            || (ch >= 8192 && ch <= 8202) || ch === 8232 || ch === 8233 || ch === 8239
+            || ch === 8287 || ch === 12288)
     },
 
-    _utf8_trim_ws: function (str) {
+    _utf8_trim_ws: function(str){
         var len = str.length;
 
         if (len <= 0)
@@ -852,7 +819,7 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
 
     //Trims str st str=[0, index) after the operation.
     //Return value: the trimmed string.
-    _utf8_trim_from: function (str, index) {
+    _utf8_trim_from: function(str, index){
         var len = str.length;
         if (index >= len || index < 0)
             return;
@@ -860,7 +827,7 @@ cc.LabelBMFont = cc.SpriteBatchNode.extend(/** @lends cc.LabelBMFont# */{
     }
 });
 
-(function () {
+(function(){
     var p = cc.LabelBMFont.prototype;
     cc.EventHelper.prototype.apply(p);
 
@@ -892,11 +859,7 @@ cc.LabelBMFont.create = function (str, fntFile, width, alignment, imageOffset) {
     return new cc.LabelBMFont(str, fntFile, width, alignment, imageOffset);
 };
 
-cc.FntFrameCache = {};
-
 var _fntLoader = {
-    FNT_HEAD: /fntframes [^\n]*(\n|$)/gi,
-    FNT_FRAME_NAME: /fntframe [^\n]*(\n|$)/gi,
     INFO_EXP: /info [^\n]*(\n|$)/gi,
     COMMON_EXP: /common [^\n]*(\n|$)/gi,
     PAGE_EXP: /page [^\n]*(\n|$)/gi,
@@ -922,8 +885,24 @@ var _fntLoader = {
         return obj;
     },
 
-    _parseFntContent: function (fnt, fntStr, url, useAtlas) {
-        var self = this;
+    /**
+     * Parse Fnt string.
+     * @param fntStr
+     * @param url
+     * @returns {{}}
+     */
+    parseFnt: function (fntStr, url) {
+        var self = this, fnt = {};
+        //padding
+        var infoObj = self._parseStrToObj(fntStr.match(self.INFO_EXP)[0]);
+        var paddingArr = infoObj["padding"].split(",");
+        var padding = {
+            left: parseInt(paddingArr[0]),
+            top: parseInt(paddingArr[1]),
+            right: parseInt(paddingArr[2]),
+            bottom: parseInt(paddingArr[3])
+        };
+
         //common
         var commonObj = self._parseStrToObj(fntStr.match(self.COMMON_EXP)[0]);
         fnt.commonHeight = commonObj["lineHeight"];
@@ -937,11 +916,7 @@ var _fntLoader = {
         //page
         var pageObj = self._parseStrToObj(fntStr.match(self.PAGE_EXP)[0]);
         if (pageObj["id"] !== 0) cc.log("cc.LabelBMFont._parseImageFileName() : file could not be found");
-        if(!useAtlas) {
-            fnt.atlasName = cc.path.changeBasename(url, pageObj["file"]);
-        } else {
-            fnt.atlasName = cc.path.join(cc.path.dirname(useAtlas.path) + pageObj["file"]);
-        }
+        fnt.atlasName = cc.path.changeBasename(url, pageObj["file"]);
 
         //char
         var charLines = fntStr.match(self.CHAR_EXP);
@@ -965,40 +940,6 @@ var _fntLoader = {
                 var kerningObj = self._parseStrToObj(kerningLines[i]);
                 kerningDict[(kerningObj["first"] << 16) | (kerningObj["second"] & 0xffff)] = kerningObj["amount"];
             }
-        }
-
-        return fnt;
-    },
-
-    /**
-     * Parse Fnt string.
-     * @param fntStr
-     * @param url
-     * @returns {{}}
-     */
-    parseFnt: function (fntStr, url) {
-        var self = this, fnt = {};
-        var headString = fntStr.match(self.FNT_HEAD);
-        if(headString) {
-            var headObj = self._parseStrToObj(headString[0]);
-            if(headObj && headObj.count) {
-                fntStr = fntStr.substr(headString[0].length);
-                var fntFrames = fntStr.split("----");
-                for(var i = 0; i < headObj.count; ++i) {
-                    var contentString = fntFrames[i];
-                    var frameNameStr = contentString.match(self.FNT_FRAME_NAME);
-                    if(frameNameStr) {
-                        var frameName = self._parseStrToObj(frameNameStr[0]);
-                        if(frameName && frameName.name) {
-                            fnt = {};
-                            var realFntPathKey = cc.path.join(cc.path.dirname(url), frameName.name);
-                            cc.FntFrameCache[realFntPathKey] = this._parseFntContent(fnt, contentString.substr(frameNameStr[0].length), url, {path: frameName.name});
-                        }
-                    }
-                }
-            }
-        } else {
-            fnt = this._parseFntContent(fnt, fntStr, url);
         }
         return fnt;
     },

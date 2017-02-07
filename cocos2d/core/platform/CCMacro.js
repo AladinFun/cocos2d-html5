@@ -497,14 +497,6 @@ cc.ORIENTATION_LANDSCAPE = 2;
  */
 cc.ORIENTATION_AUTO = 3;
 
-/**
- * The limit count for concurrency http request, useful in some mobile browsers
- * Adjust its value with the test results based on your game, the preset value is just a placeholder
- * @constant
- * @type Number
- */
-cc.CONCURRENCY_HTTP_REQUEST_COUNT = cc.sys.isMobile ? 20 : 0;
-
 
 // ------------------- vertex attrib flags -----------------------------
 /**
@@ -624,11 +616,6 @@ cc.SHADER_SPRITE_POSITION_TEXTURECOLOR = "ShaderSpritePositionTextureColor";
  * @constant
  * @type {String}
  */
-cc.SHADER_SPRITE_POSITION_TEXTURECOLOR_GRAY = "ShaderSpritePositionTextureColorGray";
-/**
- * @constant
- * @type {String}
- */
 cc.SHADER_POSITION_TEXTURECOLORALPHATEST = "ShaderPositionTextureColorAlphaTest";
 /**
  * @constant
@@ -654,7 +641,7 @@ cc.SHADER_POSITION_TEXTURE = "ShaderPositionTexture";
  * @constant
  * @type {String}
  */
-cc.SHADER_POSITION_TEXTURE_UCOLOR = "ShaderPositionTextureUColor";
+cc.SHADER_POSITION_TEXTURE_UCOLOR = "ShaderPositionTexture_uColor";
 /**
  * @constant
  * @type {String}
@@ -664,7 +651,7 @@ cc.SHADER_POSITION_TEXTUREA8COLOR = "ShaderPositionTextureA8Color";
  * @constant
  * @type {String}
  */
-cc.SHADER_POSITION_UCOLOR = "ShaderPositionUColor";
+cc.SHADER_POSITION_UCOLOR = "ShaderPosition_uColor";
 /**
  * @constant
  * @type {String}

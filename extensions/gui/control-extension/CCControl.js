@@ -148,26 +148,29 @@ cc.Control = cc.Layer.extend(/** @lends cc.Control# */{
     },
 
     init: function () {
-        // Initialise instance variables
-        this._state = cc.CONTROL_STATE_NORMAL;
-        this._enabled = true;
-        this._selected = false;
-        this._highlighted = false;
+        if (cc.Layer.prototype.init.call(this)) {
+            // Initialise instance variables
+            this._state = cc.CONTROL_STATE_NORMAL;
+            this._enabled = true;
+            this._selected = false;
+            this._highlighted = false;
 
-        var listener = cc.EventListener.create({
-            event: cc.EventListener.TOUCH_ONE_BY_ONE,
-            swallowTouches: true
-        });
-        if (this.onTouchBegan)
-            listener.onTouchBegan = this.onTouchBegan.bind(this);
-        if (this.onTouchMoved)
-            listener.onTouchMoved = this.onTouchMoved.bind(this);
-        if (this.onTouchEnded)
-            listener.onTouchEnded = this.onTouchEnded.bind(this);
-        if (this.onTouchCancelled)
-            listener.onTouchCancelled = this.onTouchCancelled.bind(this);
-        this._touchListener = listener;
-        return true;
+            var listener = cc.EventListener.create({
+                event: cc.EventListener.TOUCH_ONE_BY_ONE,
+                swallowTouches: true
+            });
+            if (this.onTouchBegan)
+                listener.onTouchBegan = this.onTouchBegan.bind(this);
+            if (this.onTouchMoved)
+                listener.onTouchMoved = this.onTouchMoved.bind(this);
+            if (this.onTouchEnded)
+                listener.onTouchEnded = this.onTouchEnded.bind(this);
+            if (this.onTouchCancelled)
+                listener.onTouchCancelled = this.onTouchCancelled.bind(this);
+            this._touchListener = listener;
+            return true;
+        } else
+            return false;
     },
 
     onEnter: function () {

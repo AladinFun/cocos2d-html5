@@ -108,7 +108,7 @@ return {
 
     childrenOrderDirty: true,
     assignedZ: 0,
-    assignedZStep: 1 / 100,
+    assignedZStep: 1/100,
 
     _transformNodePool: [],                              //save nodes transform dirty
     _renderCmds: [],                                     //save renderer commands
@@ -126,7 +126,7 @@ return {
 
         this.mat4Identity = new cc.math.Matrix4();
         this.mat4Identity.identity();
-        initQuadBuffer(500);
+        initQuadBuffer(2000);
         if (cc.sys.os === cc.sys.OS_IOS) {
             _IS_IOS = true;
         }
@@ -232,24 +232,24 @@ return {
 
     clear: function () {
         var gl = cc._renderContext;
-        gl.clearColor(this._clearColor.r / 255, this._clearColor.g / 255, this._clearColor.b / 255, this._clearColor.a / 255);
+        gl.clearColor(this._clearColor.r, this._clearColor.g, this._clearColor.b, this._clearColor.a);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     },
 
-    setDepthTest: function (enable) {
+    setDepthTest: function (enable){
         var gl = cc._renderContext;
-        if (enable) {
+        if(enable){
             gl.clearDepth(1.0);
             gl.enable(gl.DEPTH_TEST);
             gl.depthFunc(gl.LEQUAL);
         }
-        else {
+        else{
             gl.disable(gl.DEPTH_TEST);
         }
     },
     
     pushRenderCommand: function (cmd) {
-        if (!cmd.needDraw())
+        if(!cmd.needDraw())
             return;
         if (this._isCacheToBufferOn) {
             var currentId = this._currentID, locCmdBuffer = this._cacheToBufferCmds;
@@ -274,10 +274,7 @@ return {
 
         // Check batching
         var node = cmd._node;
-        var texture = node._texture || (node._spriteFrame ? node._spriteFrame._texture : null);
-        if (!texture) {
-            return;
-        }
+        var texture = node._texture;
         var blendSrc = node._blendFunc.src;
         var blendDst = node._blendFunc.dst;
         var shader = cmd._shaderProgram;

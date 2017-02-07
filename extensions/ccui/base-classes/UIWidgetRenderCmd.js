@@ -25,7 +25,7 @@
 cc.game.addEventListener(cc.game.EVENT_RENDERER_INITED, function () {
     if (cc._renderType === cc.game.RENDER_TYPE_CANVAS) {
         ccui.Widget.CanvasRenderCmd = function (renderable) {
-            this._pNodeCmdCtor(renderable);
+            cc.ProtectedNode.CanvasRenderCmd.call(this, renderable);
             this._needDraw = false;
         };
 
@@ -33,27 +33,14 @@ cc.game.addEventListener(cc.game.EVENT_RENDERER_INITED, function () {
         proto.constructor = ccui.Widget.CanvasRenderCmd;
 
         proto.visit = function (parentCmd) {
-            var node = this._node, renderer = cc.renderer;
-
-            parentCmd = parentCmd || this.getParentRenderCmd();
-            if (parentCmd)
-                this._curLevel = parentCmd._curLevel + 1;
-
-            if (isNaN(node._customZ)) {
-                node._vertexZ = renderer.assignedZ;
-                renderer.assignedZ += renderer.assignedZStep;
+            var node = this._node;
+            if (node._visible) {
+                node._adaptRenderers();
+                this.pNodeVisit(parentCmd);
             }
-
-            node._adaptRenderers();
-            this._syncStatus(parentCmd);
         };
 
         proto.transform = function (parentCmd, recursive) {
-            if (!this._transform) {
-                this._transform = {a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0};
-                this._worldTransform = {a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0};
-            }
-
             var node = this._node;
             if (node._visible && node._running) {
                 node._adaptRenderers();
@@ -71,10 +58,11 @@ cc.game.addEventListener(cc.game.EVENT_RENDERER_INITED, function () {
             }
         };
 
+        proto.widgetVisit = proto.visit;
         proto.widgetTransform = proto.transform;
     } else {
         ccui.Widget.WebGLRenderCmd = function (renderable) {
-            this._pNodeCmdCtor(renderable);
+            cc.ProtectedNode.WebGLRenderCmd.call(this, renderable);
             this._needDraw = false;
         };
 
@@ -82,27 +70,14 @@ cc.game.addEventListener(cc.game.EVENT_RENDERER_INITED, function () {
         proto.constructor = ccui.Widget.WebGLRenderCmd;
 
         proto.visit = function (parentCmd) {
-            var node = this._node, renderer = cc.renderer;
-
-            parentCmd = parentCmd || this.getParentRenderCmd();
-            if (parentCmd)
-                this._curLevel = parentCmd._curLevel + 1;
-
-            if (isNaN(node._customZ)) {
-                node._vertexZ = renderer.assignedZ;
-                renderer.assignedZ += renderer.assignedZStep;
+            var node = this._node;
+            if (node._visible) {
+                node._adaptRenderers();
+                this.pNodeVisit(parentCmd);
             }
-
-            node._adaptRenderers();
-            this._syncStatus(parentCmd);
         };
 
-        proto.transform = function (parentCmd, recursive) {
-            if (!this._transform) {
-                this._transform = {a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0};
-                this._worldTransform = {a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0};
-            }
-
+        proto.transform = function(parentCmd, recursive){
             var node = this._node;
             if (node._visible && node._running) {
                 node._adaptRenderers();
@@ -121,6 +96,7 @@ cc.game.addEventListener(cc.game.EVENT_RENDERER_INITED, function () {
             }
         };
 
+        proto.widgetVisit = proto.visit;
         proto.widgetTransform = proto.transform;
     }
 });

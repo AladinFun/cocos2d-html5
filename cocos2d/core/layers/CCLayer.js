@@ -40,8 +40,19 @@ cc.Layer = cc.Node.extend(/** @lends cc.Layer# */{
         this._ignoreAnchorPointForPosition = true;
         this.setAnchorPoint(0.5, 0.5);
         this.setContentSize(cc.winSize);
-        this._cascadeColorEnabled = false;
-        this._cascadeOpacityEnabled = false;
+    },
+
+    /**
+     * Initialization of the layer, please do not call this function by yourself, you should pass the parameters to constructor to initialize a layer
+     */
+    init: function(){
+        var _t = this;
+        _t._ignoreAnchorPointForPosition = true;
+        _t.setAnchorPoint(0.5, 0.5);
+        _t.setContentSize(cc.winSize);
+        _t._cascadeColorEnabled = false;
+        _t._cascadeOpacityEnabled = false;
+        return true;
     },
 
     /**
@@ -50,7 +61,7 @@ cc.Layer = cc.Node.extend(/** @lends cc.Layer# */{
      * @function
      * @see cc.Layer#unbake
      */
-    bake: function () {
+    bake: function(){
         this._renderCmd.bake();
     },
 
@@ -60,7 +71,7 @@ cc.Layer = cc.Node.extend(/** @lends cc.Layer# */{
      * @function
      * @see cc.Layer#bake
      */
-    unbake: function () {
+    unbake: function(){
         this._renderCmd.unbake();
     },
 
@@ -70,56 +81,16 @@ cc.Layer = cc.Node.extend(/** @lends cc.Layer# */{
      * @returns {boolean}
      * @see cc.Layer#bake and cc.Layer#unbake
      */
-    isBaked: function () {
+    isBaked: function(){
         return this._renderCmd._isBaked;
     },
 
-    visit: function (parent) {
-        // quick return if not visible
-        if (!this._visible)
-            return;
-
-        var renderer = cc.renderer, cmd = this._renderCmd;
-        cmd.visit(parent && parent._renderCmd);
-
-        if (cmd._isBaked) {
-            renderer.pushRenderCommand(cmd);
-            cmd._bakeSprite.visit(this);
-        }
-        else {
-            var i, children = this._children, len = children.length, child;
-            if (len > 0) {
-                if (this._reorderChildDirty) {
-                    this.sortAllChildren();
-                }
-                // draw children zOrder < 0
-                for (i = 0; i < len; i++) {
-                    child = children[i];
-                    if (child._localZOrder < 0) {
-                        child.visit(this);
-                    }
-                    else {
-                        break;
-                    }
-                }
-
-                renderer.pushRenderCommand(cmd);
-                for (; i < len; i++) {
-                    children[i].visit(this);
-                }
-            } else {
-                renderer.pushRenderCommand(cmd);
-            }
-        }
-        cmd._dirtyFlag = 0;
-    },
-
-    addChild: function (child, localZOrder, tag) {
+    addChild: function(child, localZOrder, tag){
         cc.Node.prototype.addChild.call(this, child, localZOrder, tag);
         this._renderCmd._bakeForAddChild(child);
     },
 
-    _createRenderCmd: function () {
+    _createRenderCmd: function(){
         if (cc._renderType === cc.game.RENDER_TYPE_CANVAS)
             return new cc.Layer.CanvasRenderCmd(this);
         else
@@ -217,7 +188,7 @@ cc.LayerColor = cc.Layer.extend(/** @lends cc.LayerColor# */{
      * @param {Number} [width=]
      * @param {Number} [height=]
      */
-    ctor: function (color, width, height) {
+    ctor: function(color, width, height){
         cc.Layer.prototype.ctor.call(this);
         this._blendFunc = cc.BlendFunc._alphaNonPremultiplied();
         cc.LayerColor.prototype.init.call(this, color, width, height);
@@ -241,53 +212,10 @@ cc.LayerColor = cc.Layer.extend(/** @lends cc.LayerColor# */{
         locRealColor.g = color.g;
         locRealColor.b = color.b;
         this._realOpacity = color.a;
-        this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.colorDirty | cc.Node._dirtyFlags.opacityDirty);
+        this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.colorDirty|cc.Node._dirtyFlags.opacityDirty);
 
         cc.LayerColor.prototype.setContentSize.call(this, width, height);
         return true;
-    },
-
-    visit: function () {
-        // quick return if not visible
-        if (!this._visible)
-            return;
-
-        var renderer = cc.renderer, cmd = this._renderCmd;
-        cmd.visit(parent && parent._renderCmd);
-
-        if (cmd._isBaked) {
-            renderer.pushRenderCommand(cmd._bakeRenderCmd);
-            //the bakeSprite is drawing
-            cmd._bakeSprite._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.transformDirty);
-            cmd._bakeSprite.visit(this);
-        }
-        else {
-            var i, children = this._children, len = children.length;
-            if (len > 0) {
-                if (this._reorderChildDirty) {
-                    this.sortAllChildren();
-                }
-                // draw children zOrder < 0
-                for (i = 0; i < len; i++) {
-                    child = children[i];
-                    if (child._localZOrder < 0) {
-                        child.visit(this);
-                    }
-                    else {
-                        break;
-                    }
-                }
-
-                renderer.pushRenderCommand(cmd);
-                for (; i < len; i++) {
-                    children[i].visit(this);
-                }
-            } else {
-                renderer.pushRenderCommand(cmd);
-            }
-        }
-
-        cmd._dirtyFlag = 0;
     },
 
     /**
@@ -307,7 +235,7 @@ cc.LayerColor = cc.Layer.extend(/** @lends cc.LayerColor# */{
         this._renderCmd.updateBlendFunc(locBlendFunc);
     },
 
-    _createRenderCmd: function () {
+    _createRenderCmd: function(){
         if (cc._renderType === cc.game.RENDER_TYPE_CANVAS)
             return new cc.LayerColor.CanvasRenderCmd(this);
         else
@@ -329,7 +257,7 @@ cc.LayerColor.create = function (color, width, height) {
 };
 
 //LayerColor - Getter Setter
-(function () {
+(function(){
     var proto = cc.LayerColor.prototype;
     cc.defineGetterSetter(proto, "width", proto._getWidth, proto._setWidth);
     cc.defineGetterSetter(proto, "height", proto._getHeight, proto._setHeight);
@@ -400,12 +328,12 @@ cc.LayerGradient = cc.LayerColor.extend(/** @lends cc.LayerGradient# */{
         this._startOpacity = 255;
         this._endOpacity = 255;
 
-        if (stops && stops instanceof Array) {
+        if(stops && stops instanceof Array){
             this._colorStops = stops;
-            stops.splice(0, 0, {p: 0, color: start || cc.color.BLACK});
-            stops.push({p: 1, color: end || cc.color.BLACK});
+            stops.splice(0, 0, {p:0, color: start || cc.color.BLACK});
+            stops.push({p:1, color: end || cc.color.BLACK});
         } else
-            this._colorStops = [{p: 0, color: start || cc.color.BLACK}, {p: 1, color: end || cc.color.BLACK}];
+            this._colorStops = [{p:0, color: start || cc.color.BLACK}, {p:1, color: end || cc.color.BLACK}];
 
         cc.LayerGradient.prototype.init.call(this, start, end, v, stops);
     },
@@ -437,7 +365,7 @@ cc.LayerGradient = cc.LayerColor.extend(/** @lends cc.LayerGradient# */{
         _t._compressedInterpolation = true;
 
         cc.LayerColor.prototype.init.call(_t, cc.color(start.r, start.g, start.b, 255));
-        this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.colorDirty | cc.Node._dirtyFlags.opacityDirty | cc.Node._dirtyFlags.gradientDirty);
+        this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.colorDirty|cc.Node._dirtyFlags.opacityDirty|cc.Node._dirtyFlags.gradientDirty);
         return true;
     },
 
@@ -480,7 +408,7 @@ cc.LayerGradient = cc.LayerColor.extend(/** @lends cc.LayerGradient# */{
         this.color = color;
         //update the color stops
         var stops = this._colorStops;
-        if (stops && stops.length > 0) {
+        if(stops && stops.length > 0){
             var selColor = stops[0].color;
             selColor.r = color.r;
             selColor.g = color.g;
@@ -503,8 +431,8 @@ cc.LayerGradient = cc.LayerColor.extend(/** @lends cc.LayerGradient# */{
         locColor.b = color.b;
         //update the color stops
         var stops = this._colorStops;
-        if (stops && stops.length > 0) {
-            var selColor = stops[stops.length - 1].color;
+        if(stops && stops.length > 0){
+            var selColor = stops[stops.length -1].color;
             selColor.r = color.r;
             selColor.g = color.g;
             selColor.b = color.b;
@@ -528,7 +456,7 @@ cc.LayerGradient = cc.LayerColor.extend(/** @lends cc.LayerGradient# */{
         this._startOpacity = o;
         //update the color stops
         var stops = this._colorStops;
-        if (stops && stops.length > 0)
+        if(stops && stops.length > 0)
             stops[0].color.a = o;
         this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.opacityDirty);
     },
@@ -548,8 +476,8 @@ cc.LayerGradient = cc.LayerColor.extend(/** @lends cc.LayerGradient# */{
     setEndOpacity: function (o) {
         this._endOpacity = o;
         var stops = this._colorStops;
-        if (stops && stops.length > 0)
-            stops[stops.length - 1].color.a = o;
+        if(stops && stops.length > 0)
+            stops[stops.length -1].color.a = o;
         this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.opacityDirty);
     },
 
@@ -603,7 +531,7 @@ cc.LayerGradient = cc.LayerColor.extend(/** @lends cc.LayerGradient# */{
      * [{p: 0, color: cc.color.RED},{p: 1, color: cc.color.RED},...]
      * @returns {Array}
      */
-    getColorStops: function () {
+    getColorStops: function(){
         return this._colorStops;
     },
     /**
@@ -620,13 +548,13 @@ cc.LayerGradient = cc.LayerColor.extend(/** @lends cc.LayerGradient# */{
      * //where p = A value between 0.0 and 1.0 that represents the position between start and end in a gradient
      *
      */
-    setColorStops: function (colorStops) {
+    setColorStops: function(colorStops){
         this._colorStops = colorStops;
         //todo need update  the start color and end color
-        this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.colorDirty | cc.Node._dirtyFlags.opacityDirty | cc.Node._dirtyFlags.gradientDirty);
+        this._renderCmd.setDirtyFlag(cc.Node._dirtyFlags.colorDirty|cc.Node._dirtyFlags.opacityDirty|cc.Node._dirtyFlags.gradientDirty);
     },
 
-    _createRenderCmd: function () {
+    _createRenderCmd: function(){
         if (cc._renderType === cc.game.RENDER_TYPE_CANVAS)
             return new cc.LayerGradient.CanvasRenderCmd(this);
         else
@@ -648,7 +576,7 @@ cc.LayerGradient.create = function (start, end, v, stops) {
     return new cc.LayerGradient(start, end, v, stops);
 };
 //LayerGradient - Getter Setter
-(function () {
+(function(){
     var proto = cc.LayerGradient.prototype;
     // Extended properties
     /** @expose */

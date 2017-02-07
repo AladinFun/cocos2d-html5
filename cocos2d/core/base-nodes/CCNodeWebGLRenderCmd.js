@@ -22,20 +22,16 @@
  THE SOFTWARE.
  ****************************************************************************/
 // ------------------------------ The cc.Node's render command for WebGL ----------------------------------
-(function () {
+(function() {
     cc.Node.WebGLRenderCmd = function (renderable) {
-        this._node = renderable;
-        this._anchorPointInPoints = {x: 0, y: 0};
-        this._displayedColor = cc.color(255, 255, 255, 255);
+        cc.Node.RenderCmd.call(this, renderable);
         this._shaderProgram = null;
     };
 
     var proto = cc.Node.WebGLRenderCmd.prototype = Object.create(cc.Node.RenderCmd.prototype);
     proto.constructor = cc.Node.WebGLRenderCmd;
-    proto._rootCtor = cc.Node.WebGLRenderCmd;
 
-    proto._updateColor = function () {
-    };
+    proto._updateColor = function(){};
 
     proto.setShaderProgram = function (shaderProgram) {
         this._shaderProgram = shaderProgram;

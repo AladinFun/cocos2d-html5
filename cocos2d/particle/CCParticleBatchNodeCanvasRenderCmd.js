@@ -22,18 +22,17 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-(function () {
+(function(){
     /**
      * cc.ParticleBatchNode's rendering objects of Canvas
      */
-    cc.ParticleBatchNode.CanvasRenderCmd = function (renderable) {
-        this._rootCtor(renderable);
+    cc.ParticleBatchNode.CanvasRenderCmd = function(renderable){
+        cc.Node.CanvasRenderCmd.call(this, renderable);
         this._needDraw = false;
     };
 
     var proto = cc.ParticleBatchNode.CanvasRenderCmd.prototype = Object.create(cc.Node.CanvasRenderCmd.prototype);
     proto.constructor = cc.ParticleBatchNode.CanvasRenderCmd;
 
-    proto._initWithTexture = function () {
-    };
+    proto._initWithTexture = function(){};
 })();

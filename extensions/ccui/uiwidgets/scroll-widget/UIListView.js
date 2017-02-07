@@ -52,7 +52,7 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
     _ccListViewEventCallback: null,
     _magneticAllowedOutOfBoundary: true,
     _magneticType: 0,
-    _className: "ListView",
+    _className:"ListView",
 
     /**
      * allocates and initializes a UIListView.
@@ -74,7 +74,7 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * @param {ccui.Widget} model
      */
     setItemModel: function (model) {
-        if (!model) {
+        if (!model){
             cc.log("Can't set a null to item model!");
             return;
         }
@@ -82,20 +82,23 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
         this._model = model;
     },
 
-    _handleReleaseLogic: function (touch) {
+    _handleReleaseLogic: function(touch)
+    {
         ccui.ScrollView.prototype._handleReleaseLogic.call(this, touch);
 
-        if (!this._autoScrolling) {
+        if(!this._autoScrolling)
+        {
             this._startMagneticScroll();
         }
     },
 
-    _onItemListChanged: function () {
+    _onItemListChanged: function()
+    {
         this._outOfBoundaryAmountDirty = true;
     },
 
     _updateInnerContainerSize: function () {
-        var i, locItems = this._items, length;
+        var locItems = this._items, length, i;
         switch (this.direction) {
             case ccui.ScrollView.DIR_VERTICAL:
                 length = locItems.length;
@@ -237,7 +240,8 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
             zOrder = zOrder || widget.getLocalZOrder();
             tag = tag || widget.getName();
             ccui.ScrollView.prototype.addChild.call(this, widget, zOrder, tag);
-            if (widget instanceof ccui.Widget) {
+            if(widget instanceof ccui.Widget)
+            {
                 this._items.push(widget);
                 this._onItemListChanged();
             }
@@ -250,10 +254,10 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * @param {cc.Node} widget
      * @param {Boolean} [cleanup=true]
      */
-    removeChild: function (widget, cleanup) {
+    removeChild: function(widget, cleanup){
         if (widget) {
             var index = this._items.indexOf(widget);
-            if (index > -1)
+            if(index > -1)
                 this._items.splice(index, 1);
 
             this._onItemListChanged();
@@ -265,7 +269,7 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
     /**
      * Removes all children from ccui.ListView.
      */
-    removeAllChildren: function () {
+    removeAllChildren: function(){
         this.removeAllChildrenWithCleanup(true);
     },
 
@@ -273,7 +277,7 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Removes all children from ccui.ListView and do a cleanup all running actions depending on the cleanup parameter.
      * @param {Boolean} cleanup
      */
-    removeAllChildrenWithCleanup: function (cleanup) {
+    removeAllChildrenWithCleanup: function(cleanup){
         ccui.ScrollView.prototype.removeAllChildrenWithCleanup.call(this, cleanup);
         this._items = [];
 
@@ -316,7 +320,7 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
     /**
      * Removes all items from ccui.ListView.
      */
-    removeAllItems: function () {
+    removeAllItems: function(){
         this.removeAllChildren();
     },
 
@@ -345,7 +349,7 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * @returns {Number} the index of item.
      */
     getIndex: function (item) {
-        if (item == null)
+        if(item == null)
             return -1;
         return this._items.indexOf(item);
     },
@@ -365,7 +369,8 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Set magnetic type of ListView.
      * @param {ccui.ListView.MAGNETIC_NONE|ccui.ListView.MAGNETIC_CENTER,ccui.ListView.MAGNETIC_BOTH_END|ccui.ListView.MAGNETIC_LEFT|ccui.ListView.MAGNETIC_RIGHT|ccui.ListView.MAGNETIC_TOP|ccui.ListView.MAGNETIC_BOTTOM} magneticType
      */
-    setMagneticType: function (magneticType) {
+    setMagneticType: function(magneticType)
+    {
         this._magneticType = magneticType;
         this._onItemListChanged();
         this._startMagneticScroll();
@@ -375,7 +380,8 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Get magnetic type of ListView.
      * @returns {number}
      */
-    getMagneticType: function () {
+    getMagneticType: function()
+    {
         return this._magneticType;
     },
 
@@ -383,7 +389,8 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Set magnetic allowed out of boundary.
      * @param {boolean} magneticAllowedOutOfBoundary
      */
-    setMagneticAllowedOutOfBoundary: function (magneticAllowedOutOfBoundary) {
+    setMagneticAllowedOutOfBoundary: function(magneticAllowedOutOfBoundary)
+    {
         this._magneticAllowedOutOfBoundary = magneticAllowedOutOfBoundary;
     },
 
@@ -391,7 +398,8 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Query whether the magnetic out of boundary is allowed.
      * @returns {boolean}
      */
-    getMagneticAllowedOutOfBoundary: function () {
+    getMagneticAllowedOutOfBoundary: function()
+    {
         return this._magneticAllowedOutOfBoundary;
     },
 
@@ -410,7 +418,7 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Returns the margin between each item.
      * @returns {Number}
      */
-    getItemsMargin: function () {
+    getItemsMargin:function(){
         return this._itemsMargin;
     },
 
@@ -435,17 +443,21 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
         ccui.ScrollView.prototype.setDirection.call(this, dir);
     },
 
-    _getHowMuchOutOfBoundary: function (addition) {
-        if (addition === undefined)
+    _getHowMuchOutOfBoundary: function(addition)
+    {
+        if(addition === undefined)
             addition = cc.p(0, 0);
 
-        if (!this._magneticAllowedOutOfBoundary || this._items.length === 0) {
+        if(!this._magneticAllowedOutOfBoundary || this._items.length === 0)
+        {
             return ccui.ScrollView.prototype._getHowMuchOutOfBoundary.call(this, addition);
         }
-        else if (this._magneticType === ccui.ListView.MAGNETIC_NONE || this._magneticType === ccui.ListView.MAGNETIC_BOTH_END) {
+        else if(this._magneticType === ccui.ListView.MAGNETIC_NONE || this._magneticType === ccui.ListView.MAGNETIC_BOTH_END)
+        {
             return ccui.ScrollView.prototype._getHowMuchOutOfBoundary.call(this, addition);
         }
-        else if (addition.x === 0 && addition.y === 0 && !this._outOfBoundaryAmountDirty) {
+        else if(addition.x === 0 && addition.y === 0 && !this._outOfBoundaryAmountDirty)
+        {
             return this._outOfBoundaryAmount;
         }
 
@@ -460,7 +472,8 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
         var firstItemAdjustment = cc.p(0, 0);
         var lastItemAdjustment = cc.p(0, 0);
 
-        switch (this._magneticType) {
+        switch (this._magneticType)
+        {
             case  ccui.ListView.MAGNETIC_CENTER:
                 firstItemAdjustment.x = (contentSize.width - this._items[0].width) / 2;
                 firstItemAdjustment.y = (contentSize.height - this._items[0].height) / 2;
@@ -490,44 +503,55 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
         // Calculate the actual amount
         var outOfBoundaryAmount = cc.p(0, 0);
 
-        if (this._innerContainer.getLeftBoundary() + addition.x > leftBoundary) {
+        if(this._innerContainer.getLeftBoundary() + addition.x > leftBoundary)
+        {
             outOfBoundaryAmount.x = leftBoundary - (this._innerContainer.getLeftBoundary() + addition.x);
         }
-        else if (this._innerContainer.getRightBoundary() + addition.x < rightBoundary) {
+        else if(this._innerContainer.getRightBoundary() + addition.x < rightBoundary)
+        {
             outOfBoundaryAmount.x = rightBoundary - (this._innerContainer.getRightBoundary() + addition.x);
         }
 
-        if (this._innerContainer.getTopBoundary() + addition.y < topBoundary) {
+        if(this._innerContainer.getTopBoundary() + addition.y < topBoundary)
+        {
             outOfBoundaryAmount.y = topBoundary - (this._innerContainer.getTopBoundary() + addition.y);
         }
-        else if (this._innerContainer.getBottomBoundary() + addition.y > bottomBoundary) {
+        else if(this._innerContainer.getBottomBoundary() + addition.y > bottomBoundary)
+        {
             outOfBoundaryAmount.y = bottomBoundary - (this._innerContainer.getBottomBoundary() + addition.y);
         }
 
-        if (addition.x === 0 && addition.y === 0) {
+        if(addition.x === 0 && addition.y === 0)
+        {
             this._outOfBoundaryAmount = outOfBoundaryAmount;
             this._outOfBoundaryAmountDirty = false;
         }
         return outOfBoundaryAmount;
     },
 
-    _calculateItemPositionWithAnchor: function (item, itemAnchorPoint) {
+    _calculateItemPositionWithAnchor: function(item, itemAnchorPoint)
+    {
         var origin = cc.p(item.getLeftBoundary(), item.getBottomBoundary());
         var size = item.getContentSize();
 
-        return cc.p(origin.x + size.width * itemAnchorPoint.x, origin.y + size.height * itemAnchorPoint.y);
+        return cc.p(origin. x + size.width * itemAnchorPoint.x, origin.y + size.height * itemAnchorPoint.y);
     },
 
-    _findClosestItem: function (targetPosition, items, itemAnchorPoint, firstIndex, distanceFromFirst, lastIndex, distanceFromLast) {
+    _findClosestItem: function(targetPosition, items, itemAnchorPoint, firstIndex, distanceFromFirst, lastIndex, distanceFromLast)
+    {
         cc.assert(firstIndex >= 0 && lastIndex < items.length && firstIndex <= lastIndex, "");
-        if (firstIndex === lastIndex) {
+        if (firstIndex === lastIndex)
+        {
             return items[firstIndex];
         }
-        if (lastIndex - firstIndex === 1) {
-            if (distanceFromFirst <= distanceFromLast) {
+        if (lastIndex - firstIndex === 1)
+        {
+            if (distanceFromFirst <= distanceFromLast)
+            {
                 return items[firstIndex];
             }
-            else {
+            else
+            {
                 return items[lastIndex];
             }
         }
@@ -537,11 +561,13 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
         var itemPosition = this._calculateItemPositionWithAnchor(items[midIndex], itemAnchorPoint);
         var distanceFromMid = cc.pLength(cc.pSub(targetPosition, itemPosition));
 
-        if (distanceFromFirst <= distanceFromLast) {
+        if (distanceFromFirst <= distanceFromLast)
+        {
             // Left half
             return this._findClosestItem(targetPosition, items, itemAnchorPoint, firstIndex, distanceFromFirst, midIndex, distanceFromMid);
         }
-        else {
+        else
+        {
             // Right half
             return this._findClosestItem(targetPosition, items, itemAnchorPoint, midIndex, distanceFromMid, lastIndex, distanceFromLast);
         }
@@ -554,8 +580,10 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * @param {cc.Point} itemAnchorPoint Specifies an anchor point of each item for position to calculate distance.
      * @returns {?ccui.Widget} A item instance if list view is not empty. Otherwise, returns null.
      */
-    getClosestItemToPosition: function (targetPosition, itemAnchorPoint) {
-        if (this._items.length === 0) {
+    getClosestItemToPosition: function(targetPosition, itemAnchorPoint)
+    {
+        if (this._items.length === 0)
+        {
             return null;
         }
 
@@ -580,7 +608,8 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * @returns {?ccui.Widget} A item instance if list view is not empty. Otherwise, returns null.
      */
 
-    getClosestItemToPositionInCurrentView: function (positionRatioInView, itemAnchorPoint) {
+    getClosestItemToPositionInCurrentView: function(positionRatioInView, itemAnchorPoint)
+    {
         // Calculate the target position
         var contentSize = this.getContentSize();
         var targetPosition = cc.pMult(this._innerContainer.getPosition(), -1);
@@ -594,7 +623,8 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Query the center item
      * @returns {?ccui.Widget} A item instance.
      */
-    getCenterItemInCurrentView: function () {
+    getCenterItemInCurrentView: function()
+    {
         return this.getClosestItemToPositionInCurrentView(cc.p(0.5, 0.5), cc.p(0.5, 0.5));
     },
 
@@ -602,8 +632,10 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Query the leftmost item in horizontal list
      * @returns {?ccui.Widget} A item instance.
      */
-    getLeftmostItemInCurrentView: function () {
-        if (this._direction === ccui.ScrollView.DIR_HORIZONTAL) {
+    getLeftmostItemInCurrentView: function()
+    {
+        if(this._direction === ccui.ScrollView.DIR_HORIZONTAL)
+        {
             return this.getClosestItemToPositionInCurrentView(cc.p(0, 0.5), cc.p(0.5, 0.5));
         }
 
@@ -614,8 +646,10 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Query the rightmost item in horizontal list
      * @returns {?ccui.Widget} A item instance.
      */
-    getRightmostItemInCurrentView: function () {
-        if (this._direction === ccui.ScrollView.DIR_HORIZONTAL) {
+    getRightmostItemInCurrentView: function()
+    {
+        if(this._direction === ccui.ScrollView.DIR_HORIZONTAL)
+        {
             return this.getClosestItemToPositionInCurrentView(cc.p(1, 0.5), cc.p(0.5, 0.5));
         }
 
@@ -626,8 +660,10 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Query the topmost item in horizontal list
      * @returns {?ccui.Widget} A item instance.
      */
-    getTopmostItemInCurrentView: function () {
-        if (this._direction === ccui.ScrollView.DIR_VERTICAL) {
+    getTopmostItemInCurrentView: function()
+    {
+        if(this._direction === ccui.ScrollView.DIR_VERTICAL)
+        {
             return this.getClosestItemToPositionInCurrentView(cc.p(0.5, 1), cc.p(0.5, 0.5));
         }
 
@@ -638,15 +674,18 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Query the topmost item in horizontal list
      * @returns {?ccui.Widget} A item instance.
      */
-    getBottommostItemInCurrentView: function () {
-        if (this._direction === ccui.ScrollView.DIR_VERTICAL) {
+    getBottommostItemInCurrentView: function()
+    {
+        if(this._direction === ccui.ScrollView.DIR_VERTICAL)
+        {
             return this.getClosestItemToPositionInCurrentView(cc.p(0.5, 0), cc.p(0.5, 0.5));
         }
 
         return null;
     },
 
-    _calculateItemDestination: function (positionRatioInView, item, itemAnchorPoint) {
+    _calculateItemDestination: function(positionRatioInView, item, itemAnchorPoint)
+    {
         var contentSize = this.getContentSize();
         var positionInView = cc.p(0, 0);
         positionInView.x += contentSize.width * positionRatioInView.x;
@@ -656,57 +695,68 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
         return cc.pMult(cc.pSub(itemPosition, positionInView), -1);
     },
 
-    jumpToBottom: function () {
+    jumpToBottom: function()
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToBottom.call(this);
     },
 
-    jumpToTop: function () {
+    jumpToTop: function()
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToTop.call(this);
     },
 
-    jumpToLeft: function () {
+    jumpToLeft: function()
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToLeft.call(this);
     },
 
-    jumpToRight: function () {
+    jumpToRight: function()
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToRight.call(this);
     },
 
-    jumpToTopLeft: function () {
+    jumpToTopLeft: function()
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToTopLeft.call(this);
     },
 
-    jumpToTopRight: function () {
+    jumpToTopRight: function()
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToTopRight.call(this);
     },
 
-    jumpToBottomLeft: function () {
+    jumpToBottomLeft: function()
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToBottomLeft.call(this);
     },
 
-    jumpToBottomRight: function () {
+    jumpToBottomRight: function()
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToBottomRight.call(this);
     },
 
-    jumpToPercentVertical: function (percent) {
+    jumpToPercentVertical: function(percent)
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToPercentVertical.call(this, percent);
     },
 
-    jumpToPercentHorizontal: function (percent) {
+    jumpToPercentHorizontal: function(percent)
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToPercentHorizontal.call(this, percent);
     },
 
-    jumpToPercentBothDirection: function (percent) {
+    jumpToPercentBothDirection: function(percent)
+    {
         this.doLayout();
         ccui.ScrollView.prototype.jumpToPercentBothDirection.call(this, percent);
     },
@@ -717,17 +767,19 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * @param {cc.Point} positionRatioInView Specifies the position with ratio in list view's content size.
      * @param {cc.Point} itemAnchorPoint Specifies an anchor point of each item for position to calculate distance.
      */
-    jumpToItem: function (itemIndex, positionRatioInView, itemAnchorPoint) {
+    jumpToItem: function(itemIndex, positionRatioInView, itemAnchorPoint)
+    {
         var item = this.getItem(itemIndex);
 
-        if (!item)
+        if(!item)
             return;
 
         this.doLayout();
 
         var destination = this._calculateItemDestination(positionRatioInView, item, itemAnchorPoint);
 
-        if (!this.bounceEnabled) {
+        if(!this.bounceEnabled)
+        {
             var delta = cc.pSub(destination, this._innerContainer.getPosition());
             var outOfBoundary = this._getHowMuchOutOfBoundary(delta);
             destination.x += outOfBoundary.x;
@@ -744,13 +796,14 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * @param {cc.Point} itemAnchorPoint Specifies an anchor point of each item for position to calculate distance.
      * @param {number} [timeInSec = 1.0] Scroll time
      */
-    scrollToItem: function (itemIndex, positionRatioInView, itemAnchorPoint, timeInSec) {
-        if (timeInSec === undefined)
+    scrollToItem: function(itemIndex, positionRatioInView, itemAnchorPoint, timeInSec)
+    {
+        if(timeInSec === undefined)
             timeInSec = 1;
 
         var item = this.getItem(itemIndex);
 
-        if (!item)
+        if(!item)
             return;
 
         var destination = this._calculateItemDestination(positionRatioInView, item, itemAnchorPoint);
@@ -776,15 +829,16 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
     /**
      * provides a public _doLayout function for Editor. it calls _doLayout.
      */
-    doLayout: function () {
+    doLayout: function(){
         this._doLayout();
     },
 
-    requestDoLayout: function () {
+    requestDoLayout: function()
+    {
         this._refreshViewDirty = true;
     },
 
-    _doLayout: function () {
+    _doLayout: function(){
         //ccui.Layout.prototype._doLayout.call(this);
         if (this._refreshViewDirty) {
             var locItems = this._items;
@@ -814,19 +868,19 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
      * Adds callback function called ListView event triggered
      * @param {Function} selector
      */
-    addEventListener: function (selector) {
+    addEventListener: function(selector){
         this._ccListViewEventCallback = selector;
     },
 
     _selectedItemEvent: function (event) {
         var eventEnum = (event === ccui.Widget.TOUCH_BEGAN) ? ccui.ListView.ON_SELECTED_ITEM_START : ccui.ListView.ON_SELECTED_ITEM_END;
-        if (this._listViewEventSelector) {
+        if(this._listViewEventSelector){
             if (this._listViewEventListener)
                 this._listViewEventSelector.call(this._listViewEventListener, this, eventEnum);
             else
                 this._listViewEventSelector(this, eventEnum);
         }
-        if (this._ccListViewEventCallback)
+        if(this._ccListViewEventCallback)
             this._ccListViewEventCallback(this, eventEnum);
     },
 
@@ -889,7 +943,7 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
     },
 
     _copySpecialProperties: function (listView) {
-        if (listView instanceof ccui.ListView) {
+        if(listView instanceof ccui.ListView){
             ccui.ScrollView.prototype._copySpecialProperties.call(this, listView);
             this.setItemModel(listView._model);
             this.setItemsMargin(listView._itemsMargin);
@@ -900,21 +954,27 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
         }
     },
 
-    _startAttenuatingAutoScroll: function (deltaMove, initialVelocity) {
+    _startAttenuatingAutoScroll: function(deltaMove, initialVelocity)
+    {
         var adjustedDeltaMove = deltaMove;
 
-        if (this._items.length !== 0 && this._magneticType !== ccui.ListView.MAGNETIC_NONE) {
+        if(this._items.length !== 0 && this._magneticType !== ccui.ListView.MAGNETIC_NONE)
+        {
             adjustedDeltaMove = this._flattenVectorByDirection(adjustedDeltaMove);
 
             var howMuchOutOfBoundary = this._getHowMuchOutOfBoundary(adjustedDeltaMove);
             // If the destination is out of boundary, do nothing here. Because it will be handled by bouncing back.
-            if (howMuchOutOfBoundary.x === 0 && howMuchOutOfBoundary.y === 0) {
+            if(howMuchOutOfBoundary.x === 0 && howMuchOutOfBoundary.y === 0 )
+            {
                 var magType = this._magneticType;
-                if (magType === ccui.ListView.MAGNETIC_BOTH_END) {
-                    if (this._direction === ccui.ScrollView.DIR_HORIZONTAL) {
+                if(magType === ccui.ListView.MAGNETIC_BOTH_END)
+                {
+                    if(this._direction === ccui.ScrollView.DIR_HORIZONTAL)
+                    {
                         magType = (adjustedDeltaMove.x > 0 ? ccui.ListView.MAGNETIC_LEFT : ccui.ListView.MAGNETIC_RIGHT);
                     }
-                    else if (this._direction === ccui.ScrollView.DIR_VERTICAL) {
+                    else if(this._direction === ccui.ScrollView.DIR_VERTICAL)
+                    {
                         magType = (adjustedDeltaMove.y > 0 ? ccui.ListView.MAGNETIC_BOTTOM : ccui.ListView.MAGNETIC_TOP);
                     }
                 }
@@ -930,37 +990,34 @@ ccui.ListView = ccui.ScrollView.extend(/** @lends ccui.ListView# */{
                 adjustedDeltaMove = cc.pSub(magneticPosition, itemPosition);
             }
         }
-        ccui.ScrollView.prototype._startAttenuatingAutoScroll.call(this, adjustedDeltaMove, initialVelocity);
+        ccui.ScrollView.prototype._startAttenuatingAutoScroll.call(this,adjustedDeltaMove, initialVelocity);
     },
 
-    _getAnchorPointByMagneticType: function (magneticType) {
-        switch (magneticType) {
-            case ccui.ListView.MAGNETIC_NONE:
-                return cc.p(0, 0);
-            case ccui.ListView.MAGNETIC_BOTH_END:
-                return cc.p(0, 1);
-            case ccui.ListView.MAGNETIC_CENTER:
-                return cc.p(0.5, 0.5);
-            case ccui.ListView.MAGNETIC_LEFT:
-                return cc.p(0, 0.5);
-            case ccui.ListView.MAGNETIC_RIGHT:
-                return cc.p(1, 0.5);
-            case ccui.ListView.MAGNETIC_TOP:
-                return cc.p(0.5, 1);
-            case ccui.ListView.MAGNETIC_BOTTOM:
-                return cc.p(0.5, 0);
+    _getAnchorPointByMagneticType: function(magneticType)
+    {
+        switch(magneticType)
+        {
+            case ccui.ListView.MAGNETIC_NONE: return cc.p(0, 0);
+            case ccui.ListView.MAGNETIC_BOTH_END: return cc.p(0, 1);
+            case ccui.ListView.MAGNETIC_CENTER: return cc.p(0.5, 0.5);
+            case ccui.ListView.MAGNETIC_LEFT: return cc.p(0, 0.5);
+            case ccui.ListView.MAGNETIC_RIGHT: return cc.p(1, 0.5);
+            case ccui.ListView.MAGNETIC_TOP: return cc.p(0.5, 1);
+            case ccui.ListView.MAGNETIC_BOTTOM: return cc.p(0.5, 0);
         }
 
         return cc.p(0, 0);
     },
 
-    _startMagneticScroll: function () {
-        if (this._items.length === 0 || this._magneticType === ccui.ListView.MAGNETIC_NONE) {
+    _startMagneticScroll: function()
+    {
+        if(this._items.length === 0 || this._magneticType === ccui.ListView.MAGNETIC_NONE)
+        {
             return;
         }
 
         // Find the closest item
-        var magneticAnchorPoint = this._getAnchorPointByMagneticType(this._magneticType);
+        var magneticAnchorPoint =this._getAnchorPointByMagneticType(this._magneticType);
         var magneticPosition = cc.pMult(this._innerContainer.getPosition(), -1);
         magneticPosition.x += this.width * magneticAnchorPoint.x;
         magneticPosition.y += this.height * magneticAnchorPoint.y;

@@ -50,7 +50,7 @@ cc._tmp.PrototypeColor = function () {
      * @private
      */
     _p._getBlue = function () {
-        return _p(0, 0, 255);
+        return  _p(0, 0, 255);
     };
 
     /**
@@ -135,16 +135,16 @@ cc._tmp.PrototypeColor = function () {
     _p.GRAY;
     cc.defineGetterSetter(_p, "GRAY", _p._getGray);
 
-    cc.BlendFunc._disable = function () {
+    cc.BlendFunc._disable = function(){
         return new cc.BlendFunc(cc.ONE, cc.ZERO);
     };
-    cc.BlendFunc._alphaPremultiplied = function () {
+    cc.BlendFunc._alphaPremultiplied = function(){
         return new cc.BlendFunc(cc.ONE, cc.ONE_MINUS_SRC_ALPHA);
     };
-    cc.BlendFunc._alphaNonPremultiplied = function () {
+    cc.BlendFunc._alphaNonPremultiplied = function(){
         return new cc.BlendFunc(cc.SRC_ALPHA, cc.ONE_MINUS_SRC_ALPHA);
     };
-    cc.BlendFunc._additive = function () {
+    cc.BlendFunc._additive = function(){
         return new cc.BlendFunc(cc.SRC_ALPHA, cc.ONE);
     };
 
