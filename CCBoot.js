@@ -1885,7 +1885,8 @@ var _initSys = function () {
         var tmpCanvas = document.createElement("CANVAS");
         try{
             var context = cc.create3DContext(tmpCanvas, {'stencil': true});
-            if (context && context.getShaderPrecisionFormat) {
+            //if (context && context.getShaderPrecisionFormat) {
+            if (context) {
                 _supportWebGL = true;
             }
 

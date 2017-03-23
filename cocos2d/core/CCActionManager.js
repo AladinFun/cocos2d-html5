@@ -101,6 +101,7 @@ cc.ActionManager = cc.Class.extend(/** @lends cc.ActionManager# */{
         element.currentAction = null;
         element.currentActionSalvaged = false;
         element.paused = false;
+        element.target = null;  //#引擎自修改   @jetfire
         this._elementPool.push(element);
     },
 
