@@ -49,7 +49,6 @@
     var supportWebAudio = !!(window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 
     var support = {ONLY_ONE: false, WEB_AUDIO: supportWebAudio, DELAY_CREATE_CTX: false, ONE_SOURCE: false};
-    cc.log("test: support webaudio " + supportWebAudio);
     if (sys.browserType === sys.BROWSER_TYPE_FIREFOX) {
         support.DELAY_CREATE_CTX = true;
         support.USE_LOADER_EVENT = 'canplay';
@@ -110,7 +109,6 @@ cc.Audio = cc.Class.extend({
     },
 
     play: function (offset, loop) {
-        cc.log("audio type:" + this._AUDIO_TYPE + " src: " + this.src);
         if (!this._element) return;
         this._element.loop = loop;
         this._element.play();
@@ -358,7 +356,7 @@ cc.Audio.WebAudio.prototype = {
 
 
 
-        useWebAudio: false,
+        useWebAudio: true,
 
         loadBuffer: function (url, cb) {
             if (!SWA) return; // WebAudio Buffer
@@ -394,7 +392,6 @@ cc.Audio.WebAudio.prototype = {
         },
 
         load: function (realUrl, url, res, cb) {
-
             if (support.length === 0)
                 return cb("can not support audio!");
 
@@ -729,7 +726,7 @@ cc.Audio.WebAudio.prototype = {
                     effectList.push(ctx.audio);
                 }
             });
-            loader.useWebAudio = false;
+            // loader.useWebAudio = false;
 
             return ctx.audio || {
                     pause: function () {

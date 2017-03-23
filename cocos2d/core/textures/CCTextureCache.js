@@ -216,6 +216,7 @@ cc.textureCache = /** @lends cc.textureCache# */{
             return;
         if (this._textures[textureKeyName]) {
             this._textures[textureKeyName].releaseTexture();
+
             delete(this._textures[textureKeyName]);
         }
     },
