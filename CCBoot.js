@@ -750,6 +750,7 @@ cc.loader = (function () {
                 cb();
             }, false);
             s.addEventListener('error', function () {
+                _jsCache[jsPath] = false;   //如果加载失败不设置为已cache
                 s.parentNode.removeChild(s);
                 cb("Load " + jsPath + " failed!");
             }, false);
@@ -1014,6 +1015,7 @@ cc.loader = (function () {
                 loader = _register[type.toLowerCase()];
             }
             if (!loader) {
+                console.log(item);
                 cc.error("loader for [" + type + "] not exists!");
                 return cb();
             }
@@ -1162,7 +1164,11 @@ cc.loader = (function () {
             var self = this, dict = self.getRes(url);
             if (!dict) {
                 self.load(url, function (err, results) {
-                    self._handleAliases(results[0]["filenames"], callback);
+                    if (err) {
+                        callback(err);
+                    } else {
+                        self._handleAliases(results[0]["filenames"], callback);
+                    }
                 });
             } else
                 self._handleAliases(dict["filenames"], callback);
