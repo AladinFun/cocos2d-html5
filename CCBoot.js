@@ -2722,7 +2722,7 @@ cc.game = /** @lends cc.game# */{
              = cc.create3DContext(localCanvas, {
                 'stencil': true,
                 'antialias': !cc.sys.isMobile,
-                'alpha': false
+                'alpha': true //false会导致闪屏
             });
         }
         // WebGL context created successfully
