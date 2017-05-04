@@ -905,6 +905,8 @@ cc.Sprite = cc.Node.extend(/** @lends cc.Sprite# */{
             this._loader.once(texture, function () {
                 this.setTexture(texture);
                 this.dispatchEvent("load");
+                if (isFileName)
+                    this._changeRectWithTexture(texture);
             }, this);
             return false;
         }

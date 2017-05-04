@@ -1610,6 +1610,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
 Body.prototype.getPos = function() { return this.p; };
 Body.prototype.getVel = function() { return new Vect(this.vx, this.vy); };
 Body.prototype.getAngVel = function() { return this.w; };
+Body.prototype.getAngle = function() { return this.a; };
 // chipmunk v7.0 compatibility
 Body.prototype.getPosition = Body.prototype.getPos;
 Body.prototype.getVelocity = Body.prototype.getVel;
