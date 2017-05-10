@@ -632,7 +632,7 @@ cc.TableView = cc.ScrollView.extend(/** @lends cc.TableView# */{
                 if(locTableViewDelegate.tableCellUnhighlight)
                     locTableViewDelegate.tableCellUnhighlight(this, this._touchedCell);
                 if(locTableViewDelegate.tableCellTouched)
-                    locTableViewDelegate.tableCellTouched(this, this._touchedCell);
+                    locTableViewDelegate.tableCellTouched(this, this._touchedCell,touch);
             }
             this._touchedCell = null;
         }

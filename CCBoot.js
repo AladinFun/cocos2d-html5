@@ -22,7 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-
+window.ALADIN_FUN_IS_SINGLE_FILE = true;
 /**
  * The main namespace of Cocos2d-JS, all engine core classes, functions, properties and constants are defined in this namespace
  * @namespace
