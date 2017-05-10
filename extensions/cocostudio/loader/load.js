@@ -250,7 +250,10 @@ ccs.csLoader = {
 cc.loader.register(["json"], {
     load : function(realUrl, url, res, cb){
         cc.loader.loadJson(realUrl, function(error, data){
-            var path = cc.path;
+            var path = cc.path,
+                isPlanetJson = /^res\/planet\d+\.json$/.test(res),
+                PLANET_IMAGE_PATTERN = /^planets\/planet\d+\/\d+\_\d+\_\d+\.png$/,
+                PLANET_FLAG_PATTERN = /^planets\/flags\/flag_\d+\.png$/;
             if(data && data["Content"] && data["Content"]["Content"]["UsedResources"]){
                 var UsedResources = data["Content"]["Content"]["UsedResources"],
                     dirname = path.dirname(url),
@@ -259,6 +262,10 @@ cc.loader.register(["json"], {
                 for(var i=0; i<UsedResources.length; i++){
                     if (!ccs.load.preload && /\.(png|jpg$)/.test(UsedResources[i]))
                         continue;
+                    //岛屿的json，不预加载岛屿建筑默认图片，因为那些图片不需要
+                    if (isPlanetJson && (PLANET_IMAGE_PATTERN.test(UsedResources[i]) || PLANET_FLAG_PATTERN.test(UsedResources[i])))
+                        continue;
+
                     tmpUrl = path.join(dirname, UsedResources[i]);
                     normalUrl = path._normalize(tmpUrl);
                     if(!ccs.load.validate[normalUrl]){
