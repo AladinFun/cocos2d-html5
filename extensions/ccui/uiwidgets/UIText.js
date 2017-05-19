@@ -432,6 +432,10 @@ ccui.Text = ccui.Widget.extend(/** @lends ccui.Text# */{
         this._labelRenderer.setColor(color);
     },
 
+    setLineHeight: function(height) {
+        this._labelRenderer.setLineHeight(height);
+    },
+
     setTextColor: function(color){
         this._labelRenderer.setFontFillColor(color);
     },
