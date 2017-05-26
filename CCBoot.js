@@ -220,7 +220,7 @@ cc.isCrossOrigin = function (url) {
         cc.log("invalid URL");
         return false;
     }
-    var startIndex = url.indexOf("://");
+    var startIndex = url.indexOf("//");
     if (startIndex === -1)
         return false;
 
