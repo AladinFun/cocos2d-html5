@@ -735,6 +735,10 @@ cc.loader = (function () {
         _createScript: function (jsPath, isAsync, cb) {
             var d = document, self = this, s = document.createElement('script');
             s.async = isAsync;
+            //对项目的js进行添加允许crossorigin，方便监控onerror
+            if (cc.game.config.jsCrossOrigin && jsPath.indexOf('//') == -1) {
+                s.setAttribute('crossorigin', '');
+            }
             _jsCache[jsPath] = true;
             if(cc.game.config["noCache"] && typeof jsPath === "string"){
                 if(self._noCacheRex.test(jsPath))
